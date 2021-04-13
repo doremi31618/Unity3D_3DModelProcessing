@@ -29,7 +29,8 @@ public class VertexGizmos : MonoBehaviour
         //all the gizmos will trigger this at same time, and this would cost 
         // a lot of efficacy
         if(oldPosition != transform.localPosition){
-            OnEditPosition();
+            if (OnEditPosition != null)
+                OnEditPosition();
             oldPosition = transform.localPosition;
         }
     }

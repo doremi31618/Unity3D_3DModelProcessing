@@ -36,8 +36,10 @@
     <ImplicitlyExpandDesignTimeFacades>false</ImplicitlyExpandDesignTimeFacades>
   </PropertyGroup>
   <ItemGroup>
-     <Compile Include="Assets\Scripts\EditMesh.cs" />
      <Compile Include="Assets\Scripts\VertexGizmos.cs" />
+     <Compile Include="Assets\Scripts\EditMesh.cs" />
+     <Compile Include="Assets\Scripts\SnapFace.cs" />
+     <Compile Include="Assets\Scripts\FaceGizmos.cs" />
     <Reference Include="UnityEngine">
         <HintPath>/Applications/Unity/Hub/Editor/2020.1.1f1/Unity.app/Contents/Managed/UnityEngine/UnityEngine.dll</HintPath>
     </Reference>
