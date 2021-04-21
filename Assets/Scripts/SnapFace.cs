@@ -14,12 +14,12 @@ public class SnapFace : MonoBehaviour
     private float minDistance = 0.01f;
     public List<GameObject> triangleHandle;
     public EditMesh editMesh;
-    Rigidbody rigidbody;
+    Rigidbody rigidBody;
 
     void DetectFaceNormal(object o, HitEventArgs e){
         if (e.distance <= minDistance)return;
         Debug.Log("Detect Face");
-        rigidbody.MovePosition(transform.position + e.direction.normalized * Time.deltaTime * speed);
+        rigidBody.MovePosition(transform.position + e.direction.normalized * Time.deltaTime * speed);
     }
 
     void OnValueChange(){
@@ -33,8 +33,8 @@ public class SnapFace : MonoBehaviour
 
     void OnEnable(){
         triangleHandle = new List<GameObject>();
-        if (rigidbody == null)
-            rigidbody = GetComponent<Rigidbody>();
+        if (rigidBody == null)
+            rigidBody = GetComponent<Rigidbody>();
 
         if(editMesh == null)
             editMesh = GetComponent<EditMesh>();
@@ -50,7 +50,7 @@ public class SnapFace : MonoBehaviour
 
             FaceGizmos faceGizmos = triangle.AddComponent<FaceGizmos>();
             faceGizmos.OnHitSomething += new HitEventHandler(DetectFaceNormal);
-            faceGizmos.Initialize(vertices, rayLength, true);
+            faceGizmos.Initialize(vertices, rayLength);
             triangleHandle.Add(triangle);
         }
 

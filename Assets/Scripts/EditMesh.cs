@@ -13,7 +13,6 @@ public class EditMesh : MonoBehaviour
     Vector3[] vertices;
     Vector3[] normals;
     int[] triangles;
-    [HideInInspector]public GameObject parentGameObject;
     public List<GameObject> handles = new List<GameObject>();
     public Vector3[] getVertices{get{return vertices;}}
     public Vector3[] getNormals{get{return normals;}}
@@ -59,7 +58,7 @@ public class EditMesh : MonoBehaviour
         vertices = mesh.vertices;
         triangles = mesh.triangles;
         normals = mesh.normals;
-            
+        Debug.Log(vertices.Length);
         
         if(handles.Count != 0)return;
         foreach(var p in vertices){
@@ -74,13 +73,11 @@ public class EditMesh : MonoBehaviour
     }
 
     void OnDisable(){
-        DestroyImmediate(parentGameObject);
         foreach(var handle in handles){
             DestroyImmediate(handle);
         }
 
         handles.Clear();
-        parentGameObject = null;
         vertices = null;
         triangles= null;
         normals  = null;
