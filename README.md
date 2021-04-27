@@ -38,7 +38,6 @@
     <p> just Remove the script</p>
     <h2>Preview</h2>
     <img src="img/SplitSurface.png">
-<<<<<<< HEAD
     <h1>Center Model</h1>
     <h2>Intro</h2>
     <p> a practice demo that show how to center your model</p>
@@ -46,6 +45,4 @@
     <img src="img/center_before.png">
     <h2>After</h2>
     <img src="img/center_after.png"> 
-=======
->>>>>>> 66e42e37e9790bc4d441cb0546ca6f3c9e76d6a1
 </div>
