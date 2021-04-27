@@ -39,12 +39,18 @@
      <Compile Include="Assets\Scripts\SnapFace.cs" />
      <Compile Include="Assets\Scripts\VertexGizmos.cs" />
      <Compile Include="Assets\Scripts\ProceduralMeshGenerator.cs" />
+<<<<<<< HEAD
      <Compile Include="Assets\Scripts\SurfaceDataManager.cs" />
+=======
+>>>>>>> 66e42e37e9790bc4d441cb0546ca6f3c9e76d6a1
      <Compile Include="Assets\Scripts\SurfaceSplitor.cs" />
      <Compile Include="Assets\Scripts\SetRenderMode.cs" />
      <Compile Include="Assets\Scripts\FaceGizmos.cs" />
      <Compile Include="Assets\Scripts\EditMesh.cs" />
+<<<<<<< HEAD
      <Compile Include="Assets\Scripts\CenterModel.cs" />
+=======
+>>>>>>> 66e42e37e9790bc4d441cb0546ca6f3c9e76d6a1
      <None Include="Assets\Shader\VertexColor.shader" />
     <Reference Include="UnityEngine">
         <HintPath>/Applications/Unity/Hub/Editor/2020.1.1f1/Unity.app/Contents/Managed/UnityEngine/UnityEngine.dll</HintPath>

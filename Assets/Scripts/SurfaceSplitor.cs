@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+<<<<<<< HEAD
 public class TriangleData{
     public Vector3[] vertices;
     public Vector3 normal;
@@ -16,18 +17,24 @@ public class TriangleData{
     }
 }
 
+=======
+>>>>>>> 66e42e37e9790bc4d441cb0546ca6f3c9e76d6a1
 
 /// <summary>
 /// It can be optimize by removing duplicate vertex and triangles 
 /// </summary>
 public class SurfaceData
 {
+<<<<<<< HEAD
     //Use in Surface Splitor
+=======
+>>>>>>> 66e42e37e9790bc4d441cb0546ca6f3c9e76d6a1
     public List<Vector3> vertices;
     public List<int> triangles;
     public List<Vector3> normals;
     public List<Vector2> UVs;
 
+<<<<<<< HEAD
     //Use in Surface Data Manager
     public int triangleCount = 0;
     public Vector3[] verticesArray;
@@ -37,6 +44,8 @@ public class SurfaceData
 
     bool isTransform = false;
 
+=======
+>>>>>>> 66e42e37e9790bc4d441cb0546ca6f3c9e76d6a1
     public Vector3 getLastNormal
     {
         get
@@ -45,8 +54,11 @@ public class SurfaceData
         }
     }
 
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> 66e42e37e9790bc4d441cb0546ca6f3c9e76d6a1
     int getTriangleCount
     {
         get
@@ -55,7 +67,11 @@ public class SurfaceData
         }
     }
 
+<<<<<<< HEAD
     //constructor
+=======
+
+>>>>>>> 66e42e37e9790bc4d441cb0546ca6f3c9e76d6a1
     public SurfaceData(Vector3[] first_vertices, Vector2[] first_UV)
     {
         vertices = new List<Vector3>(first_vertices);
@@ -64,7 +80,10 @@ public class SurfaceData
         normals = new List<Vector3>();
         normals.Add(Vector3.Cross(first_vertices[1] - first_vertices[0], first_vertices[2] - first_vertices[0]));
     }
+<<<<<<< HEAD
 
+=======
+>>>>>>> 66e42e37e9790bc4d441cb0546ca6f3c9e76d6a1
     public SurfaceData(Vector3[] first_vertices, int[] first_triangle, Vector2[] first_UV)
     {
         vertices = new List<Vector3>(first_vertices);
@@ -74,6 +93,7 @@ public class SurfaceData
         normals.Add(Vector3.Cross(first_vertices[1] - first_vertices[0], first_vertices[2] - first_vertices[0]));
     }
 
+<<<<<<< HEAD
     //Add Data function
     public void AddData(Vector3[] first_vertices,int[] first_triangle, Vector2[] first_UV)
     {
@@ -83,6 +103,8 @@ public class SurfaceData
         normals.Add(Vector3.Cross(first_vertices[1] - first_vertices[0], first_vertices[2] - first_vertices[0]));
     }
 
+=======
+>>>>>>> 66e42e37e9790bc4d441cb0546ca6f3c9e76d6a1
     public void AddData(Vector3[] first_vertices, Vector2[] first_UV)
     {
         UVs.AddRange(first_UV);
@@ -90,6 +112,7 @@ public class SurfaceData
         triangles.AddRange(newTrianglesData(first_vertices.Length));
         normals.Add(Vector3.Cross(first_vertices[1] - first_vertices[0], first_vertices[2] - first_vertices[0]));
     }
+<<<<<<< HEAD
     
     //Execute when generate surface GameObject
     public void TransformToArrayFormat(){
@@ -121,6 +144,9 @@ public class SurfaceData
     }
 
     //tools 
+=======
+
+>>>>>>> 66e42e37e9790bc4d441cb0546ca6f3c9e76d6a1
     int[] newTrianglesData(int num)
     {
         int[] _triangles = new int[num];
@@ -131,9 +157,16 @@ public class SurfaceData
         }
         return _triangles;
     }
+<<<<<<< HEAD
 }
 
 [RequireComponent(typeof(MeshFilter))]
+=======
+
+
+}
+[RequireComponent(typeof(MeshFilter), typeof(EditMesh))]
+>>>>>>> 66e42e37e9790bc4d441cb0546ca6f3c9e76d6a1
 public class SurfaceSplitor : MonoBehaviour
 {
     [Range(0.01f, 0.5f)] public float normalLength = 0.2f;
@@ -234,6 +267,7 @@ public class SurfaceSplitor : MonoBehaviour
             surfaceHandle[i].transform.localPosition = Vector3.zero;
             surfaceHandle[i].AddComponent<MeshFilter>().mesh = GenerateMesh(surfaceDataCollection[i]);
             surfaceHandle[i].AddComponent<MeshRenderer>().material = material;
+<<<<<<< HEAD
             surfaceHandle[i].AddComponent<SurfaceDataManager>().Initialize(surfaceDataCollection[i]);
         }
     }
@@ -246,6 +280,16 @@ public class SurfaceSplitor : MonoBehaviour
         new_surface_mesh.uv = surface.UVsArray;
         new_surface_mesh.triangles = surface.trianglesArray;
 
+=======
+        }
+    }
+    Mesh GenerateMesh(SurfaceData surface)
+    {
+        Mesh new_surface_mesh = new Mesh();
+        new_surface_mesh.vertices = surface.vertices.ToArray();
+        new_surface_mesh.uv = surface.UVs.ToArray();
+        new_surface_mesh.triangles = surface.triangles.ToArray();
+>>>>>>> 66e42e37e9790bc4d441cb0546ca6f3c9e76d6a1
         //important
         new_surface_mesh.RecalculateNormals();
         new_surface_mesh.RecalculateBounds();
