@@ -2,6 +2,7 @@
 
 
 <div>
+    <p>This project's mesh simplify features is made by <a href="https://github.com/Whinarn/UnityMeshSimplifier">UnityMeshSimplifier</a></p>
     <h1>Model Editor</h1>
     <h2>Intro</h2>
     <p> a practice demo that show how to modify mesh data through Unity3D </p>

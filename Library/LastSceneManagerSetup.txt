@@ -1,5 +1,5 @@
 sceneSetups:
-- path: Assets/Scenes/SplitSurface.unity
+- path: Assets/Scenes/FIndingEdge.unity
   isLoaded: 1
   isActive: 1
   isSubScene: 0

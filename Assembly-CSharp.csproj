@@ -36,21 +36,18 @@
     <ImplicitlyExpandDesignTimeFacades>false</ImplicitlyExpandDesignTimeFacades>
   </PropertyGroup>
   <ItemGroup>
-     <Compile Include="Assets\Scripts\SnapFace.cs" />
-     <Compile Include="Assets\Scripts\VertexGizmos.cs" />
-     <Compile Include="Assets\Scripts\ProceduralMeshGenerator.cs" />
-<<<<<<< HEAD
-     <Compile Include="Assets\Scripts\SurfaceDataManager.cs" />
-=======
->>>>>>> 66e42e37e9790bc4d441cb0546ca6f3c9e76d6a1
-     <Compile Include="Assets\Scripts\SurfaceSplitor.cs" />
-     <Compile Include="Assets\Scripts\SetRenderMode.cs" />
-     <Compile Include="Assets\Scripts\FaceGizmos.cs" />
-     <Compile Include="Assets\Scripts\EditMesh.cs" />
-<<<<<<< HEAD
-     <Compile Include="Assets\Scripts\CenterModel.cs" />
-=======
->>>>>>> 66e42e37e9790bc4d441cb0546ca6f3c9e76d6a1
+     <Compile Include="Assets\Scripts\Experiment\SnapFace.cs" />
+     <Compile Include="Assets\Scripts\ModelEditor\VertexGizmos.cs" />
+     <Compile Include="Assets\Scripts\Experiment\ProceduralMeshGenerator.cs" />
+     <Compile Include="Assets\Scripts\Experiment\SurfaceDataManager.cs" />
+     <Compile Include="Assets\Scripts\Experiment\SurfaceSplitor.cs" />
+     <Compile Include="Assets\Scripts\Experiment\SetRenderMode.cs" />
+     <Compile Include="Assets\Scripts\EdgeFinder.cs" />
+     <Compile Include="Assets\Scripts\ModelEditor\FaceGizmos.cs" />
+     <Compile Include="Assets\Scripts\ModelEditor\EditMesh.cs" />
+     <Compile Include="Assets\Scripts\MeshSimplify\ProcessMeshSimplify.cs" />
+     <Compile Include="Assets\Scripts\Center\CenterModel.cs" />
+     <Compile Include="Assets\Scripts\testTriangle.cs" />
      <None Include="Assets\Shader\VertexColor.shader" />
     <Reference Include="UnityEngine">
         <HintPath>/Applications/Unity/Hub/Editor/2020.1.1f1/Unity.app/Contents/Managed/UnityEngine/UnityEngine.dll</HintPath>
@@ -601,8 +598,14 @@
     <Reference Include="Unity.Timeline">
         <HintPath>/Users/zhanminxiang/Unity3D Project/Unity3D_3DModelProcessing/Library/ScriptAssemblies/Unity.Timeline.dll</HintPath>
     </Reference>
+    <Reference Include="Whinarn.UnityMeshSimplifier.Runtime">
+        <HintPath>/Users/zhanminxiang/Unity3D Project/Unity3D_3DModelProcessing/Library/ScriptAssemblies/Whinarn.UnityMeshSimplifier.Runtime.dll</HintPath>
+    </Reference>
     <Reference Include="Unity.Rider.Editor">
         <HintPath>/Users/zhanminxiang/Unity3D Project/Unity3D_3DModelProcessing/Library/ScriptAssemblies/Unity.Rider.Editor.dll</HintPath>
+    </Reference>
+    <Reference Include="Whinarn.UnityMeshSimplifier.Editor">
+        <HintPath>/Users/zhanminxiang/Unity3D Project/Unity3D_3DModelProcessing/Library/ScriptAssemblies/Whinarn.UnityMeshSimplifier.Editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.VisualStudio.Editor">
         <HintPath>/Users/zhanminxiang/Unity3D Project/Unity3D_3DModelProcessing/Library/ScriptAssemblies/Unity.VisualStudio.Editor.dll</HintPath>
