@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -10,14 +11,17 @@ public class EdgeFinder : MonoBehaviour
 {
     class Edge {
         public int[] edgeData = new int[2];
+        public Vector3[] edgeVertex = new Vector3[2];
         public Edge(int[] _edgeData){
             edgeData = _edgeData;
         }
-
+        public Edge(Vector3[] _edgeVertex){
+            edgeVertex = _edgeVertex;
+        }
         public Edge(){
         }
         public override string ToString(){
-            return "Edge point 1 : " + edgeData[0] + "Edge point 2 : " + edgeData[1];
+            return "Edge point 1 : " + edgeVertex[0] + "Edge point 2 : " + edgeVertex[1];
         } 
     }
 
@@ -65,6 +69,7 @@ public class EdgeFinder : MonoBehaviour
             int[] triangleIndex = GetTriangle(i);
             Vector3[] triangleVertex = GetTriangleVertex(triangleIndex);
             triangleNormal[i] = GetTriangleNormal(triangleVertex);
+            // print(triangleNormal[i] .normalized);
         }
         return triangleNormal;
     }
@@ -81,8 +86,29 @@ public class EdgeFinder : MonoBehaviour
             center += v/3;
         }
         return center;
+        
     }
 
+    void GenerateProceduralMesh(){
+        Mesh mesh = new Mesh();
+        Vector3[] vertices = new Vector3[]{
+            new Vector3(0, 0, 0),
+            new Vector3(0,-1, 0),
+            new Vector3(1, 0, 0),
+            new Vector3(0, 0, 1)
+        };
+        int[] indices = new int[]{0, 1, 3, 3, 1, 2};
+        mesh.vertices = vertices;
+        mesh.triangles = indices;
+
+        GetComponent<MeshFilter>().mesh = mesh;
+
+    }
+    void PrintMeshData(){
+        print("Dot product"+Vector3.Dot(new Vector3(0,0,0), new Vector3(0, 1, 0)));
+        print(String.Join(",", mesh.vertices));
+        print(String.Join(",", mesh.triangles));
+    }
 
     //brutal methods
     //find normal in each triangle
@@ -99,52 +125,44 @@ public class EdgeFinder : MonoBehaviour
         for (int i = 0; i < triangleCount; i++)
         {
             int[] sortIndex = GetTriangle(i);
-            Array.Sort(sortIndex);
+            Vector3[] triVertex = GetTriangleVertex(sortIndex);
+            // Array.Sort(sortIndex);
 
             //finding adjacent faces in mesh
             int adjacent_triangle_num = 0;
-            Vector3 normal = triangleNormal[i];
-            // Vector3 center = GetTriangleCenter(GetTriangleVertex(GetTriangle(i)));
-            // Debug.DrawLine(center, center+normal);
+            Vector3 normal = triangleNormal[i].normalized;
+
             //traverse all triangle to find the adjacent triangle
             for (int j = i+1; j < triangleCount; j++)
             {
-                if (adjacent_triangle_num == 3)break;
+                if (adjacent_triangle_num == 3 )break;
                 
                 int[] adjacent_index_clone = GetTriangle(j);
-                Array.Sort(adjacent_index_clone);
+                Vector3[] adjacentTriVertex = GetTriangleVertex(adjacent_index_clone);
 
-                int[] edgeIndex = new int[2];
-                int sameNumber = 0;
-            
+                //find duplicate numbers in two array
+                IEnumerable<Vector3> sameEdge = adjacentTriVertex.Intersect(adjacentTriVertex);
                 
-                for(int a=0; a<3; a++){
-
-                    for(int b=0; b<3; b++){
-                        
-                        if(sortIndex[a] == adjacent_index_clone[b])
-                        {
-                            // print(sortIndex[k] == adjacent_index_clone[k]);
-                            edgeIndex[sameNumber] = sortIndex[b];
-                            sameNumber ++;
-                            if (sameNumber == 2)break;
-                        }
-                    }
-                    // print(k + "sortIndex[k] : " + sortIndex[k] + " adjacent_index_clone[k] : " + adjacent_index_clone[k]);
-                    
-                }
-                
-                if(sameNumber<2)continue;
-
-                //debug to here
+                if(sameEdge.Count() <2)continue;
                 Vector3 adjacent_triangle_normal =  triangleNormal[j].normalized;
-                print(Mathf.Acos(Vector3.Dot(adjacent_triangle_normal, normal)));
+                Vector3 center1 = GetTriangleCenter(triVertex);
+                Vector3 center2 = GetTriangleCenter(adjacentTriVertex);
                 //if there are edges of triangle, add edge data to the data structure 
-                if(Mathf.Acos(Vector3.Dot(adjacent_triangle_normal, normal)) >= 85.0f * Mathf.Deg2Rad){
-                    Edge edge = new Edge(edgeIndex);
-                    print(edge.ToString());
+                bool isEdge = Mathf.Abs(Vector3.Dot(adjacent_triangle_normal, normal)) <= Mathf.Cos(25 * Mathf.PI / 180);
+                if(isEdge){
+                    print("normal1 : " + adjacent_triangle_normal);
+                    print("normal2 : " + normal);
+                    print("dot product : " + Vector3.Dot(adjacent_triangle_normal, normal));
+                    Edge edge = new Edge(sameEdge.ToArray());
+                    Edge edge_center1 = new Edge(new Vector3[]{
+                        center1,center1 + normal
+                    });
+                    Edge edge_center2 = new Edge(new Vector3[]{
+                        center2,center2 + adjacent_triangle_normal
+                    });
                     edgeList.Add(edge);
-                    
+                    edgeList.Add(edge_center1);
+                    edgeList.Add(edge_center2);
                 }else{
                     print("its not a edge");
                 }
@@ -152,7 +170,6 @@ public class EdgeFinder : MonoBehaviour
 
             
         }
-        // print("EdgeList length : "+ edgeList.Count);
         //step3 arrange edge data 
 
         //step4 build a simplify model data
@@ -168,27 +185,30 @@ public class EdgeFinder : MonoBehaviour
     void Awake()
     {
         meshFiler = GetComponent<MeshFilter>();
+        // GenerateProceduralMesh();
         mesh = meshFiler.mesh;
+        
     }
     // Start is called before the first frame update
     void Start()
     {
-        // method_1();
+        // PrintMeshData();
+        method_1();
     }
 
     // Update is called once per frame
     void Update()
     {
-        method_1();
+        // method_1();
     }
     void OnDrawGizmos(){
         Gizmos.color = Color.red;
         foreach(var e in edgeList){
-            Vector3 direction =GetVertex(e.edgeData[1]) - GetVertex(e.edgeData[0]);
-            Gizmos.DrawRay(transform.TransformPoint(GetVertex(e.edgeData[0])), direction);
+            Vector3 direction = e.edgeVertex[1] - e.edgeVertex[0];
+            Gizmos.DrawRay(e.edgeVertex[0], direction);
             
-            Gizmos.DrawSphere(transform.TransformPoint(GetVertex(e.edgeData[0])), 0.01f);
-            Gizmos.DrawSphere(transform.TransformPoint(GetVertex(e.edgeData[1])), 0.01f);
+            Gizmos.DrawSphere(transform.TransformPoint(e.edgeVertex[0]), 0.01f);
+            Gizmos.DrawSphere(transform.TransformPoint(e.edgeVertex[1]), 0.01f);
         }
     }
 }
