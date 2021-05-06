@@ -92,14 +92,31 @@ public class EdgeFinder : MonoBehaviour
     void GenerateProceduralMesh(){
         Mesh mesh = new Mesh();
         Vector3[] vertices = new Vector3[]{
-            new Vector3(0, 0, 0),
-            new Vector3(0,-1, 0),
-            new Vector3(1, 0, 0),
-            new Vector3(0, 0, 1)
+            new Vector3(1,-1, 1),
+            new Vector3(1,-1,-1),
+            new Vector3(1, 1,-1),
+            new Vector3(1, 1, 1),
+            new Vector3(-1, -1, 1),
+            new Vector3(-1, -1, -1),
+            new Vector3(-1, 1, -1),
+            new Vector3(-1, 1, 1)
         };
-        int[] indices = new int[]{0, 1, 3, 3, 1, 2};
+        int[] triangle = new int[]{
+            4,0,3,
+            4,3,7,
+            0,1,2,
+            0,2,3,
+            1,5,6,
+            1,6,2,
+            5,4,7,
+            5,7,6,
+            7,3,2,
+            7,2,6,
+            0,5,1,
+            0,4,5
+        };
         mesh.vertices = vertices;
-        mesh.triangles = indices;
+        mesh.triangles = triangle;
 
         GetComponent<MeshFilter>().mesh = mesh;
 
@@ -110,8 +127,6 @@ public class EdgeFinder : MonoBehaviour
         print(String.Join(",", mesh.triangles));
     }
 
-    //brutal methods
-    //find normal in each triangle
     void method_1()
     {
         int triangleCount = GetTrianglesArrayLength;
@@ -141,39 +156,47 @@ public class EdgeFinder : MonoBehaviour
                 Vector3[] adjacentTriVertex = GetTriangleVertex(adjacent_index_clone);
 
                 //find duplicate numbers in two array
-                IEnumerable<Vector3> sameEdge = adjacentTriVertex.Intersect(adjacentTriVertex);
+                // IEnumerable<Vector3> sameEdge = adjacentTriVertex.Intersect(adjacentTriVertex);
+                // print(sameEdge);
+
+                List<Vector3> sameEdge = new List<Vector3>();
+                for(int x=0; x<3; x++){
+                    for(int y=0; y<3; y++){
+                        if (triVertex[x] == adjacentTriVertex[y]){
+                            sameEdge.Add(triVertex[x]);
+                        }
+                    }
+                }
                 
                 if(sameEdge.Count() <2)continue;
                 Vector3 adjacent_triangle_normal =  triangleNormal[j].normalized;
-                Vector3 center1 = GetTriangleCenter(triVertex);
-                Vector3 center2 = GetTriangleCenter(adjacentTriVertex);
-                //if there are edges of triangle, add edge data to the data structure 
+                // Vector3 center1 = GetTriangleCenter(triVertex);
+                // Vector3 center2 = GetTriangleCenter(adjacentTriVertex);
                 bool isEdge = Mathf.Abs(Vector3.Dot(adjacent_triangle_normal, normal)) <= Mathf.Cos(25 * Mathf.PI / 180);
                 if(isEdge){
-                    print("normal1 : " + adjacent_triangle_normal);
-                    print("normal2 : " + normal);
-                    print("dot product : " + Vector3.Dot(adjacent_triangle_normal, normal));
                     Edge edge = new Edge(sameEdge.ToArray());
-                    Edge edge_center1 = new Edge(new Vector3[]{
-                        center1,center1 + normal
-                    });
-                    Edge edge_center2 = new Edge(new Vector3[]{
-                        center2,center2 + adjacent_triangle_normal
-                    });
+                    // Edge edge_center1 = new Edge(new Vector3[]{
+                    //     center1,center1 + normal
+                    // });
+                    // Edge edge_center2 = new Edge(new Vector3[]{
+                    //     center2,center2 + adjacent_triangle_normal
+                    // });
                     edgeList.Add(edge);
-                    edgeList.Add(edge_center1);
-                    edgeList.Add(edge_center2);
+                    // edgeList.Add(edge_center1);
+                    // edgeList.Add(edge_center2);
+                    print("Edge : " + edge);
+                    // print("Edge triangle 1 : " + String.Join(",",triVertex));
+                    // print("Edge triangle 2 : " + String.Join(",",adjacentTriVertex));
+                    // yield return new WaitForSeconds(1);
                 }else{
                     print("its not a edge");
                 }
+
             }
+            
 
             
         }
-        //step3 arrange edge data 
-
-        //step4 build a simplify model data
-
     }
 
     //find normal of each vertex based on the surrounding triangle

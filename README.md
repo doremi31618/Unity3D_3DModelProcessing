@@ -46,4 +46,9 @@
     <img src="img/center_before.png">
     <h2>After</h2>
     <img src="img/center_after.png"> 
+    <h1>Find Edge</h1>
+    <h2>Intro</h2>
+    <p> a practice demo that show how to Find Edge of model when the angle between two normal of triangle</p>
+    <h2>Before</h2>
+    <img src="img/findedge.png">
 </div>
