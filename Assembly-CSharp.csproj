@@ -41,14 +41,17 @@
      <Compile Include="Assets\3DModelProcessing\Scripts\Center\CenterModel.cs" />
      <Compile Include="Assets\3DModelProcessing\Scripts\Experiment\SetRenderMode.cs" />
      <Compile Include="Assets\3DModelProcessing\Scripts\testTriangle.cs" />
+     <Compile Include="Assets\3DModelProcessing\Scripts\Experiment\VertexNormalVisualizer.cs" />
      <Compile Include="Assets\3DModelProcessing\Scripts\ModelEditor\VertexGizmos.cs" />
      <Compile Include="Assets\3DModelProcessing\Scripts\Experiment\ProceduralMeshGenerator.cs" />
      <Compile Include="Assets\3DModelProcessing\Scripts\FindEdge\EdgeFinder.cs" />
      <Compile Include="Assets\3DModelProcessing\Scripts\ModelEditor\EditMesh.cs" />
      <Compile Include="Assets\3DModelProcessing\Scripts\Experiment\SurfaceDataManager.cs" />
+     <Compile Include="Assets\3DModelProcessing\ObjExporter\ObjExporter.cs" />
      <Compile Include="Assets\3DModelProcessing\Scripts\MeshSimplify\ProcessMeshSimplify.cs" />
      <Compile Include="Assets\3DModelProcessing\Scripts\Experiment\SnapFace.cs" />
-     <Compile Include="Assets\3DModelProcessing\ObjExporter\ObjExporter.cs" />
+     <Compile Include="Assets\3DModelProcessing\Scripts\FindEdge\EdgeReader.cs" />
+     <Compile Include="Assets\3DModelProcessing\Scripts\FindEdge\EdgeDataOptimizer.cs" />
      <None Include="Assets\3DModelProcessing\Shader\VertexColor.shader" />
     <Reference Include="UnityEngine">
         <HintPath>C:/Program Files/Unity/Hub/Editor/2020.3.5f1/Editor/Data/Managed/UnityEngine/UnityEngine.dll</HintPath>
@@ -618,10 +621,10 @@
         <HintPath>C:/Program Files/Unity/Hub/Editor/2020.3.5f1/Editor/Data/NetStandard/compat/2.0.0/shims/netfx/System.Xml.Serialization.dll</HintPath>
     </Reference>
     <Reference Include="UnityEditor.UI">
-        <HintPath>C:/Users/panos/Desktop/史語所/UnityProject/Unity3D_3DModelProcessing/Library/ScriptAssemblies/UnityEditor.UI.dll</HintPath>
+        <HintPath>C:/Users/panos/Desktop/史語所/Unity Project/Unity3D_3DModelProcessing/Library/ScriptAssemblies/UnityEditor.UI.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.UI">
-        <HintPath>C:/Users/panos/Desktop/史語所/UnityProject/Unity3D_3DModelProcessing/Library/ScriptAssemblies/UnityEngine.UI.dll</HintPath>
+        <HintPath>C:/Users/panos/Desktop/史語所/Unity Project/Unity3D_3DModelProcessing/Library/ScriptAssemblies/UnityEngine.UI.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

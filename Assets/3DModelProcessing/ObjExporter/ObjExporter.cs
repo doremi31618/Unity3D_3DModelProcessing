@@ -27,7 +27,7 @@ public class ObjExporter : ScriptableObject {
 
     private static string MeshToString(MeshFilter mf, Dictionary<string, ObjMaterial> materialList) {
         Mesh       m    = mf.sharedMesh;
-        Material[] mats = mf.GetComponent<Renderer>().sharedMaterials;
+        // Material[] mats = mf.GetComponent<Renderer>().sharedMaterials;
 
         StringBuilder sb = new StringBuilder();
 
@@ -38,15 +38,21 @@ public class ObjExporter : ScriptableObject {
 
         sb.Append("g ").Append(groupName).Append("\n");
         foreach (Vector3 lv in m.vertices) {
-            Vector3 wv = mf.transform.TransformPoint(lv);
+            // Vector3 wv = mf.transform.TransformPoint(lv);
 
             // This is sort of ugly - inverting x-component since we're in
             // a different coordinate system than "everyone" is "used to".
+            // sb.Append(string.Format(
+            //     "v {0} {1} {2}\n",
+            //     floatToStr(-wv.x),
+            //     floatToStr(wv.y),
+            //     floatToStr(wv.z)
+            // ));
             sb.Append(string.Format(
                 "v {0} {1} {2}\n",
-                floatToStr(-wv.x),
-                floatToStr(wv.y),
-                floatToStr(wv.z)
+                floatToStr(-lv.x),
+                floatToStr(lv.y),
+                floatToStr(lv.z)
             ));
         }
 
@@ -61,6 +67,12 @@ public class ObjExporter : ScriptableObject {
                 floatToStr(wv.y),
                 floatToStr(wv.z)
             ));
+            // sb.Append(string.Format(
+            //     "vn {0} {1} {2}\n",
+            //     floatToStr(-lv.x),
+            //     floatToStr(lv.y),
+            //     floatToStr(-lv.z)
+            // ));
         }
 
         sb.Append("\n");
@@ -74,23 +86,23 @@ public class ObjExporter : ScriptableObject {
         }
 
         for (int material = 0; material < m.subMeshCount; material++) {
-            sb.Append("\n");
-            sb.Append("usemtl ").Append(mats[material].name).Append("\n");
-            sb.Append("usemap ").Append(mats[material].name).Append("\n");
+            // sb.Append("\n");
+            // sb.Append("usemtl ").Append(mats[material].name).Append("\n");
+            // sb.Append("usemap ").Append(mats[material].name).Append("\n");
 
-            // See if this material is already in the material list.
-            try {
-                ObjMaterial objMaterial = new ObjMaterial {name = mats[material].name};
+            // // See if this material is already in the material list.
+            // try {
+            //     ObjMaterial objMaterial = new ObjMaterial {name = mats[material].name};
 
-                if (mats[material].mainTexture)
-                    objMaterial.textureName = AssetDatabase.GetAssetPath(mats[material].mainTexture);
-                else
-                    objMaterial.textureName = null;
+            //     if (mats[material].mainTexture)
+            //         objMaterial.textureName = AssetDatabase.GetAssetPath(mats[material].mainTexture);
+            //     else
+            //         objMaterial.textureName = null;
 
-                materialList.Add(objMaterial.name, objMaterial);
-            } catch (ArgumentException) {
-                // Already in the dictionary
-            }
+            //     materialList.Add(objMaterial.name, objMaterial);
+            // } catch (ArgumentException) {
+            //     // Already in the dictionary
+            // }
 
 
             int[] triangles = m.GetTriangles(material);
@@ -125,14 +137,24 @@ public class ObjExporter : ScriptableObject {
 
         return new Dictionary<string, ObjMaterial>();
     }
-
-
     public static void MeshToFile(MeshFilter mf, string folder, string filename) {
         Dictionary<string, ObjMaterial> materialList = PrepareFileWrite();
 
         using (StreamWriter sw = new StreamWriter(folder + "/" + filename + ".obj")) {
             sw.Write("mtllib ./" + filename + ".mtl\n");
+            sw.Write(MeshToString(mf, materialList));
+            // Debug.Log(folder + "/" + filename + ".obj" + " ; mtllib ./" + filename + ".mtl\n");
+        }
+    }
 
+
+    public static void MeshToFile(MeshFilter mf, string folder, string filename, bool custom) {
+        Dictionary<string, ObjMaterial> materialList = PrepareFileWrite();
+
+        using (StreamWriter sw = new StreamWriter(folder + "/" + filename+"_simplify" + ".obj")) {
+            // sw.Write("mtllib ./" + filename + ".mtl\n");
+            sw.Write("mtllib " + filename + ".mtl\n");
+            sw.Write("usemtl " + filename + "\n");
             sw.Write(MeshToString(mf, materialList));
             // Debug.Log(folder + "/" + filename + ".obj" + " ; mtllib ./" + filename + ".mtl\n");
         }
