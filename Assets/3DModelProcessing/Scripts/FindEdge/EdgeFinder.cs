@@ -8,69 +8,7 @@ using System.Diagnostics;
 using System.IO;
 namespace ThreeDModelProcessing
 {
-    [Serializable]
-    public class EdgeList
-    {
-        public List<Vector3> vertices;
-        public List<Vector2Int> edges;
-
-        public EdgeList(){
-            vertices = new List<Vector3>();
-            edges = new List<Vector2Int>();
-        }
-
-        public void AddEdge(Vector3 head, Vector3 tail){
-            int headIndex= 0, tailIndex = 0 ;
-            bool isContainHead = false, isContainTail = false;
-            if (!vertices.Contains(head))
-            {
-                vertices.Add(head);
-                headIndex = vertices.Count - 1;
-            }
-            else{
-                headIndex = vertices.FindIndex( x => x == head);
-                isContainHead = true;
-            }
-
-            if (!vertices.Contains(tail))
-            {
-                vertices.Add(tail);
-                tailIndex = vertices.Count - 1;
-            }
-            else{
-                tailIndex = vertices.FindIndex( x => x == tail);
-                isContainTail = true;
-            }
-
-            if (!(isContainTail && isContainHead)){
-                edges.Add(new Vector2Int(headIndex, tailIndex));
-            }
-
-
-        }
-    }
-    [Serializable]
-    public class Edge
-    {
-        public int[] edgeData = new int[2];
-        public Vector3[] edgeVertex = new Vector3[2];
-        public static string fileDefalutName = "edgeData.txt";
-        public Edge(int[] _edgeData)
-        {
-            edgeData = _edgeData;
-        }
-        public Edge(Vector3[] _edgeVertex)
-        {
-            edgeVertex = _edgeVertex;
-        }
-        public Edge()
-        {
-        }
-        public override string ToString()
-        {
-            return "head : " + edgeVertex[0].x + " tail : " + edgeVertex[1];
-        }
-    }
+    
 
     /// <summary>
     /// the mehtod of this script is based from paper below: 
@@ -86,6 +24,8 @@ namespace ThreeDModelProcessing
         [Range(10, 90)]public float angle = 25f;
         [Range(0.005f, 0.01f)]public float scale = 0.01f;
         public string path = "";
+        public int[] _triangle;
+        public Vector3[] vertices;
 
         struct Vertex3
         {
@@ -96,10 +36,10 @@ namespace ThreeDModelProcessing
         }
 
         //attributes
-        MeshFilter meshFiler;
+        MeshFilter meshFilter;
         Mesh mesh;
-        List<Edge> edgeList = new List<Edge>();
-        EdgeList edgeCollection = new EdgeList();
+        // List<Edge> edgeList = new List<Edge>();
+        EdgeRawData edgeCollection = new EdgeRawData();
 
         float percentage = 0;
 
@@ -203,6 +143,72 @@ namespace ThreeDModelProcessing
             print(String.Join(",", mesh.vertices));
             print(String.Join(",", mesh.triangles));
         }
+        IEnumerator method_2_optimize_coroutine(){
+            Stopwatch systemTimer = new Stopwatch();
+            float nextTime = 500;
+            systemTimer.Start();
+
+            //transform model to graph
+            int vertexCount = meshFilter.mesh.vertexCount;
+            int triangleCount = meshFilter.mesh.triangles.Length;
+            int[] triangles = meshFilter.mesh.triangles;
+            _triangle = triangles;
+            vertices = meshFilter.mesh.vertices;
+            print("vertex count"+ vertexCount);
+            print("triangle count" + triangleCount);
+            EdgeGraph edgeGraph = new EdgeGraph(vertexCount);
+            for(int i=0; i<triangleCount/3; i++){
+                percentage = (float)i / (float)triangleCount/3;
+                int triangleIndex = i*3;
+                edgeGraph.addEdge(triangles[triangleIndex],  triangles[triangleIndex+1]);
+                edgeGraph.addEdge(triangles[triangleIndex+1],triangles[triangleIndex+2]);
+                edgeGraph.addEdge(triangles[triangleIndex+2],  triangles[triangleIndex]);
+                if (systemTimer.ElapsedMilliseconds > nextTime){
+                    nextTime = systemTimer.ElapsedMilliseconds + 500;
+                    yield return new WaitForEndOfFrame();
+                }
+            }
+
+            edgeGraph.OutputGraph(Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "/" + "EdgeGraph.txt");
+            // retrive every vertex
+            for (int i=0; i<vertexCount; i++){
+                Vector3 averageNormal = Vector3.zero;
+                
+            }
+            
+        }
+        IEnumerator method_1_optimize_coroutine(){
+            Stopwatch systemTimer = new Stopwatch();
+            float nextTime = 500;
+            systemTimer.Start();
+
+            //transform model to graph
+            int vertexCount = meshFilter.mesh.vertexCount;
+            int triangleCount = meshFilter.mesh.triangles.Length;
+            int[] triangles = meshFilter.mesh.triangles;
+            _triangle = triangles;
+            vertices = meshFilter.mesh.vertices;
+            print("vertex count"+ vertexCount);
+            print("triangle count" + triangleCount);
+            EdgeGraph edgeGraph = new EdgeGraph(vertexCount);
+            for(int i=0; i<triangleCount/3; i++){
+                percentage = (float)i / (float)triangleCount/3;
+                int triangleIndex = i*3;
+                edgeGraph.addEdge(triangles[triangleIndex],  triangles[triangleIndex+1]);
+                edgeGraph.addEdge(triangles[triangleIndex+1],triangles[triangleIndex+2]);
+                edgeGraph.addEdge(triangles[triangleIndex+2],  triangles[triangleIndex]);
+                if (systemTimer.ElapsedMilliseconds > nextTime){
+                    nextTime = systemTimer.ElapsedMilliseconds + 500;
+                    yield return new WaitForEndOfFrame();
+                }
+            }
+
+            edgeGraph.OutputGraph(Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "/" + "EdgeGraph.txt");
+            // 
+            
+        }
+
+        
 
         IEnumerator method_1_coroutine()
         {
@@ -287,13 +293,13 @@ namespace ThreeDModelProcessing
 
         void Awake()
         {
-            meshFiler = GetComponent<MeshFilter>();
+            meshFilter = GetComponent<MeshFilter>();
             // GenerateProceduralMesh();
-            mesh = meshFiler.mesh;
+            mesh = meshFilter.mesh;
 
         }
 
-        void DrawEdge(EdgeList edgeList){
+        void DrawEdge(EdgeRawData edgeList){
             foreach (var edge in edgeList.edges){
                 Vector3 head = edgeList.vertices[edge.x];
                 Vector3 tail = edgeList.vertices[edge.y];
@@ -307,14 +313,6 @@ namespace ThreeDModelProcessing
         void OnDrawGizmos()
         {
             Gizmos.color = Color.red;
-            // foreach (var e in edgeList)
-            // {
-            //     Vector3 direction = e.edgeVertex[1] - e.edgeVertex[0];
-            //     Gizmos.DrawRay(e.edgeVertex[0], direction);
-
-            //     Gizmos.DrawSphere(transform.TransformPoint(e.edgeVertex[0]), 0.01f);
-            //     Gizmos.DrawSphere(transform.TransformPoint(e.edgeVertex[1]), 0.01f);
-            // }
             DrawEdge(edgeCollection);
         }
 
@@ -325,6 +323,13 @@ namespace ThreeDModelProcessing
             {
                 // method_1();
                 StartCoroutine(method_1_coroutine());
+            }
+
+            Rect btn2 = new Rect(250, 50, 150, 50);
+            if (GUI.Button(btn2, "method 1 optimize"))
+            {
+                // method_1();
+                StartCoroutine(method_1_optimize_coroutine());
             }
 
             GUI.Label(new Rect(50, 100, 150, 50), "Loading : " + percentage * 100 + "%");

@@ -6,8 +6,5 @@ public class EdgeDataOptimizer : MonoBehaviour
 {
 
 
-    static public List<Edge> OptimizeEdge(List<Edge> edgeData){
-        
-        return edgeData;
-    }
+    
 }

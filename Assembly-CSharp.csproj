@@ -37,8 +37,10 @@
   </PropertyGroup>
   <ItemGroup>
      <Compile Include="Assets\3DModelProcessing\Scripts\ModelEditor\FaceGizmos.cs" />
+     <Compile Include="Assets\3DModelProcessing\Scripts\FindEdge\EdgeReader.cs" />
      <Compile Include="Assets\3DModelProcessing\Scripts\Experiment\SurfaceSplitor.cs" />
      <Compile Include="Assets\3DModelProcessing\Scripts\Center\CenterModel.cs" />
+     <Compile Include="Assets\3DModelProcessing\Scripts\FindEdge\EdgeDataOptimizer.cs" />
      <Compile Include="Assets\3DModelProcessing\Scripts\Experiment\SetRenderMode.cs" />
      <Compile Include="Assets\3DModelProcessing\Scripts\testTriangle.cs" />
      <Compile Include="Assets\3DModelProcessing\Scripts\Experiment\VertexNormalVisualizer.cs" />
@@ -50,8 +52,9 @@
      <Compile Include="Assets\3DModelProcessing\ObjExporter\ObjExporter.cs" />
      <Compile Include="Assets\3DModelProcessing\Scripts\MeshSimplify\ProcessMeshSimplify.cs" />
      <Compile Include="Assets\3DModelProcessing\Scripts\Experiment\SnapFace.cs" />
-     <Compile Include="Assets\3DModelProcessing\Scripts\FindEdge\EdgeReader.cs" />
-     <Compile Include="Assets\3DModelProcessing\Scripts\FindEdge\EdgeDataOptimizer.cs" />
+     <Compile Include="Assets\3DModelProcessing\Scripts\FindEdge\EdgeGraphBuilder.cs" />
+     <Compile Include="Assets\3DModelProcessing\Scripts\FindEdge\EdgeDataFormat.cs" />
+     <None Include="Assets\3DModelProcessing\Shader\NormalDebug.shader" />
      <None Include="Assets\3DModelProcessing\Shader\VertexColor.shader" />
     <Reference Include="UnityEngine">
         <HintPath>C:/Program Files/Unity/Hub/Editor/2020.3.5f1/Editor/Data/Managed/UnityEngine/UnityEngine.dll</HintPath>

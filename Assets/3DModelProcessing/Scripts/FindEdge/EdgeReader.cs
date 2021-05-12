@@ -7,20 +7,22 @@ using ThreeDModelProcessing;
 
 public class EdgeReader : MonoBehaviour
 {
+    public static string fileName = "edgeData.txt";
     public string readFrom = "";
     // public List<Edge> edgeList = new List<Edge>();
-    public EdgeList edgeList;
-     [Range(0.005f, 0.01f)]public float scale = 0.01f;
+    public EdgeRawData edgeList;
+     [Range(0.001f, 0.01f)]public float scale = 0.01f;
+     public Color color;
     void ReadEdge(string path)
     {
 
         if (path == "")
         {
-            path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "/" + Edge.fileDefalutName;
+            path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "/" + fileName;
         }
         StreamReader sr = new StreamReader(path);
         string jsonContent = sr.ReadToEnd();
-        edgeList = JsonUtility.FromJson<EdgeList>(jsonContent);
+        edgeList = JsonUtility.FromJson<EdgeRawData>(jsonContent);
 
         // while (sr.Peek() >= 0)
         // {
@@ -50,7 +52,7 @@ public class EdgeReader : MonoBehaviour
         //     Gizmos.DrawSphere(transform.TransformPoint(e.edgeVertex[0]), 0.01f);
         //     Gizmos.DrawSphere(transform.TransformPoint(e.edgeVertex[1]), 0.01f);
         // }
-
+        Gizmos.color = color;
         foreach (var edge in edgeList.edges)
         {
             Vector3 head = edgeList.vertices[edge.x];
