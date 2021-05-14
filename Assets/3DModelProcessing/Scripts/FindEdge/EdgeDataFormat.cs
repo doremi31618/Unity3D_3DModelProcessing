@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 using System.IO;
+using System.Linq;
 // using System.Text;
 namespace ThreeDModelProcessing
 {
@@ -12,59 +13,164 @@ namespace ThreeDModelProcessing
         public int nodeNumber = 0;
         public List<int>[] graph;
         public List<int>[] getGraph { get { return graph; } }
-        public EdgeGraph(int number)
+
+        public Dictionary<Vector3, List<Vector3>> vertexGraph;
+
+        public EdgeGraph(int number, bool isUseDict)
         {
-            InitEdgeGraph(number);
+            if (isUseDict)
+            {
+                InitEdgeGraphDict(number);
+            }
+            else
+            {
+                InitEdgeGraph(number);
+            }
+
             nodeNumber = number;
         }
 
         public void InitEdgeGraph(int number)
         {
-            
+
             nodeNumber = number;
             graph = new List<int>[number];
+            vertexGraph = new Dictionary<Vector3, List<Vector3>>();
 
             for (int i = 0; i < number; i++)
             {
                 graph[i] = new List<int>();
             }
+
+        }
+
+        public void InitEdgeGraphDict(int number)
+        {
+            nodeNumber = number;
+            vertexGraph = new Dictionary<Vector3, List<Vector3>>();
+
+            // for (int i = 0; i < number; i++)
+            // {
+            //     var item = vertexGraph.ElementAt(i);
+            //     vertexGraph[item.Key] =  new List<Vector3>();
+            // }
+        }
+
+
+        public void addEdge(Vector3 vertex, Vector3 adjacentPoint)
+        {
+
+            //if isn't contains key ,create one and add ajacent point to list
+            if (!vertexGraph.ContainsKey(vertex))
+            {
+                vertexGraph.Add(vertex, new List<Vector3>());
+                vertexGraph[vertex].Add(adjacentPoint);
+            }
+            else
+            {
+                if (!vertexGraph[vertex].Contains(adjacentPoint))
+                {
+                    vertexGraph[vertex].Add(adjacentPoint);
+                }
+            }
+
+            if (!vertexGraph.ContainsKey(adjacentPoint))
+            {
+                vertexGraph.Add(adjacentPoint, new List<Vector3>());
+                vertexGraph[adjacentPoint].Add(vertex);
+            }
+            else
+            {
+                if (!vertexGraph[adjacentPoint].Contains(vertex))
+                {
+                    vertexGraph[adjacentPoint].Add(vertex);
+                }
+            }
+
         }
 
         public void addEdge(int u, int v)
         {
             if (!graph[u].Contains(v))
                 graph[u].Add(v);
-                
+
             if (!graph[v].Contains(u))
                 graph[v].Add(u);
         }
-        public void OutputGraph(string path){
+
+        public void OutputGraph(string path)
+        {
             StreamWriter sw = new StreamWriter(path);
-            for(int i=0; i<nodeNumber; i++){
-                string content =  i + " | ";
-                foreach (var node in graph[i]){
+            for (int i = 0; i < nodeNumber; i++)
+            {
+                string content = i + " | ";
+                foreach (var node in graph[i])
+                {
                     content += node.ToString() + " ";
                 }
                 sw.WriteLine(content);
             }
             sw.Close();
         }
+
+        public void OutputDictGraph(string path)
+        {
+            StreamWriter sw = new StreamWriter(path);
+            foreach (var node in vertexGraph)
+            {
+                string content = node.Key + " | ";
+                foreach(var adj in node.Value){
+                    content += adj.ToString() + " ";
+                }
+                
+                sw.WriteLine(content);
+            }
+
+
+            sw.Close();
+        }
+
+        public int[] getAdjacentIndexArray(int index)
+        {
+            return graph[index].ToArray();
+        }
+        public List<int> getAdjacentIndexList(int index)
+        {
+            return graph[index];
+        }
+
+        public Vector3[] getAdjacentVertexArray(Vector3 vertex)
+        {
+            return vertexGraph[vertex].ToArray();
+        }
+
+        public List<Vector3> getAdjacentVertexList(Vector3 vertex)
+        {
+            return vertexGraph[vertex];
+        }
     }
+
 
     [Serializable]
     public class EdgeRawData
     {
         public List<Vector3> vertices;
         public List<Vector2Int> edges;
-        public int getVertexNumber{get{return vertices.Count;}}
-        public int getEdgeNumber{get{return edges.Count;}}
+        public int getVertexNumber { get { return vertices.Count; } }
+        public int getEdgeNumber { get { return edges.Count; } }
 
         public EdgeRawData()
         {
             vertices = new List<Vector3>();
             edges = new List<Vector2Int>();
         }
-        public Vector2Int getEdge(int index){
+        public void Clear()
+        {
+            vertices.Clear();
+            edges.Clear();
+        }
+        public Vector2Int getEdge(int index)
+        {
             return edges[index];
         }
 
@@ -99,6 +205,10 @@ namespace ThreeDModelProcessing
                 edges.Add(new Vector2Int(headIndex, tailIndex));
             }
 
+            if (isContainTail && isContainHead){
+                edges.Add(new Vector2Int(headIndex, tailIndex));
+            }
+
 
         }
     }
@@ -111,11 +221,12 @@ namespace ThreeDModelProcessing
         public SimplifyModelData(EdgeRawData _rawData)
         {
             // rawData = _rawData;
-            edgeGraph = new EdgeGraph(_rawData.getVertexNumber);
+            edgeGraph = new EdgeGraph(_rawData.getVertexNumber, false);
         }
 
 
-        public void AddEdge (int u, int v){
+        public void AddEdge(int u, int v)
+        {
             edgeGraph.addEdge(u, v);
         }
 

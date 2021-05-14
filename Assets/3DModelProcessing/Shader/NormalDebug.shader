@@ -3,10 +3,12 @@ Shader "Unlit/NormalDebug"
     Properties
     {
         _MainTex ("Texture", 2D) = "white" {}
+        _Alpha ("Alpha", Range(0, 1)) = 0.8
     }
     SubShader
     {
-        Tags { "RenderType"="Opaque" }
+        Tags { "RenderType"="Transparent"  "Queue"="Transparent"}
+        Blend SrcAlpha OneMinusSrcAlpha
         LOD 100
 
         Pass
@@ -36,6 +38,7 @@ Shader "Unlit/NormalDebug"
 
             sampler2D _MainTex;
             float4 _MainTex_ST;
+            float _Alpha;
 
             v2f vert (appdata v)
             {
@@ -55,9 +58,9 @@ Shader "Unlit/NormalDebug"
                 // sample the texture
                 fixed4 col = tex2D(_MainTex, i.uv) ;
                 i.worldNormal = normalize(i.worldNormal);
-                fixed4 col_normal = fixed4(i.worldNormal * 0.5 + fixed3(0.5, 0.5, 0.5),1);
+                fixed4 col_normal = fixed4(i.worldNormal * 0.5 + fixed3(0.5, 0.5, 0.5),_Alpha);
                 // apply fog
-                UNITY_APPLY_FOG(i.fogCoord , col_normal);
+                // UNITY_APPLY_FOG(i.fogCoord , col_normal);
                 return col_normal;
             }
             ENDCG

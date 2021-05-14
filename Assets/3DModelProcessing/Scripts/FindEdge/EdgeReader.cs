@@ -7,7 +7,7 @@ using ThreeDModelProcessing;
 
 public class EdgeReader : MonoBehaviour
 {
-    public static string fileName = "edgeData.txt";
+    public string fileName = "edgeData.txt";
     public string readFrom = "";
     // public List<Edge> edgeList = new List<Edge>();
     public EdgeRawData edgeList;
