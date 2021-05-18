@@ -25,18 +25,12 @@ namespace ThreeDModelProcessing
         [Range(0.001f, 0.01f)] public float scale = 0.01f;
         public Color color = Color.white;
         public string path = "";
-        public string fileName = "edgeData.txt";
-        public string graphName = "edgeGraph.txt";
+        public string extension = ".txt";
+        public string fileName = "edgeData";
+        public string graphName = "edgeGraph";
         public int[] _triangle;
         public Vector3[] vertices;
 
-        struct Vertex3
-        {
-            public float x;
-            public float y;
-            public float z;
-
-        }
 
         //attributes
         MeshFilter meshFilter;
@@ -93,9 +87,18 @@ namespace ThreeDModelProcessing
 
         Vector3 GetTriangleNormal(Vector3[] vertices)
         {
-            Vector3 vert1 = vertices[1] - vertices[0];
-            Vector3 vert2 = vertices[2] - vertices[0];
-            return Vector3.Cross(vert1.normalized, vert2.normalized);
+            // print("============GetTriangleNormal Input Vector===========");
+            // print(vertices[0]*10000);
+            // print(vertices[1]*10000);
+            // print(vertices[2]*10000);
+            Vector3 vert1 = vertices[1]*10000 - vertices[0]*10000 ;
+            Vector3 vert2 = vertices[2]*10000  - vertices[0]*10000 ;
+            // print("============substract===========");
+            // print(vert1);
+            // print(vert2);
+            Vector3 crossProduct = Vector3.Cross(vert1.normalized, vert2.normalized).normalized;
+            // print("Cross"+crossProduct);
+            return crossProduct;
         }
 
         Vector3 GetTriangleCenter(Vector3[] vertices)
@@ -148,6 +151,114 @@ namespace ThreeDModelProcessing
             print(String.Join(",", mesh.vertices));
             print(String.Join(",", mesh.triangles));
         }
+
+        IEnumerator method_2_optimize_coroutine(){
+            Stopwatch systemTimer = new Stopwatch();
+            float nextTime = 500;
+            systemTimer.Start();
+
+            //Build graph first
+            meshFilter.mesh.Optimize();
+            int vertexCount = meshFilter.sharedMesh.vertexCount;
+            int triangleCount = meshFilter.sharedMesh.triangles.Length;
+            int[] triangles = meshFilter.sharedMesh.triangles;
+            _triangle = triangles;
+            vertices = meshFilter.mesh.vertices;
+            // print("vertex count" + vertexCount);
+            // print("triangle count" + triangleCount);
+            EdgeGraph edgeGraph = new EdgeGraph(vertexCount, true);
+            edgeGraph.InitEdgeGraphDict(vertexCount);
+            for (int i = 0; i < triangleCount / 3; i++)
+            {
+                percentage = (float)i / (float)triangleCount / 6;
+                int triangleIndex = i * 3;
+
+                Triangle newTriangle = new Triangle();
+                newTriangle.vertex1 = vertices[triangles[triangleIndex]];
+                newTriangle.vertex2 = vertices[triangles[triangleIndex + 1]];
+                newTriangle.vertex3 = vertices[triangles[triangleIndex + 2]];
+
+                edgeGraph.addTriangle(vertices[triangles[triangleIndex]], newTriangle);
+                edgeGraph.addTriangle(vertices[triangles[triangleIndex + 1]], newTriangle);
+                edgeGraph.addTriangle(vertices[triangles[triangleIndex + 2]], newTriangle);
+ 
+                if (systemTimer.ElapsedMilliseconds > nextTime)
+                {
+                    nextTime = systemTimer.ElapsedMilliseconds + 500;
+                    yield return new WaitForEndOfFrame();
+                }
+            }
+
+            if (path == "")
+                path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+            edgeGraph.OutputDictGraph(path + "/" + graphName + extension);
+
+            //clear origin data 
+            edgeCollection.Clear();
+
+            //Build normal graph 
+            for(int i=0; i< vertexCount; i++){
+                percentage = ((float)i / (float)vertexCount)/4 + 0.5f;
+                //Get Vertex
+                Vector3 vertex = vertices[i];
+                Vector3 averageNormal = Vector3.zero;
+                List<Triangle> adjacentTriangle = edgeGraph.getAdjacentTriangleList(vertex);
+                int count = adjacentTriangle.Count;
+                foreach(var tri in adjacentTriangle){
+                    averageNormal += tri.normal / count;
+                }
+                edgeGraph.addNormal(vertex, averageNormal);
+
+                if (systemTimer.ElapsedMilliseconds > nextTime)
+                {
+                    nextTime = systemTimer.ElapsedMilliseconds + 500;
+                    yield return new WaitForEndOfFrame();
+                }
+            }
+
+            for(int i=0; i< vertexCount; i++){
+                percentage = ((float)i / (float)vertexCount)/4 + 0.75f;
+                Vector3 vertex = vertices[i];
+                Vector3 averageNormal = Vector3.zero;
+                List<Triangle> adjacentTriangle = edgeGraph.getAdjacentTriangleList(vertex);
+                Vector3 normal = edgeGraph.getVertexAverageNormal(vertex);
+                
+                //check each adjacent triangle of vertex
+                foreach(var triangle in adjacentTriangle)
+                {
+                    //find common edge 
+                    Vector3[] commonEdge = triangle.edgeExcludeVertex(vertex);
+                    Triangle adjacentCell = null;
+                    //find adjacent triangle 
+                    if (commonEdge != null){
+                        Triangle[] vert0_adjacentTriangleList = edgeGraph.getAdjacentTriangleArray(commonEdge[0]);
+                        Triangle[] vert1_adjacentTriangleList = edgeGraph.getAdjacentTriangleArray(commonEdge[1]);
+                        adjacentCell = FindSameTriangleInGivenArrays(
+                            vert0_adjacentTriangleList,
+                            vert1_adjacentTriangleList,
+                            triangle
+                        );
+                    }else{
+                        print("vertex not in the edge");
+                        continue;
+                    }
+
+                    //compare 2 normal (if so add edge to list)
+                    float dotProduct = Vector3.Dot(adjacentCell.normal.normalized, normal.normalized);
+                    if (dotProduct < Mathf.Cos(angle * Mathf.Deg2Rad)){
+                        edgeCollection.AddEdge(commonEdge[0], commonEdge[1]);
+                    }
+                }
+
+                if (systemTimer.ElapsedMilliseconds > nextTime)
+                {
+                    nextTime = systemTimer.ElapsedMilliseconds + 500;
+                    yield return new WaitForEndOfFrame();
+                }
+            }
+
+
+        }
         IEnumerator method_1_optimize_coroutine()
         {
             Stopwatch systemTimer = new Stopwatch();
@@ -161,23 +272,24 @@ namespace ThreeDModelProcessing
             int[] triangles = meshFilter.sharedMesh.triangles;
             _triangle = triangles;
             vertices = meshFilter.mesh.vertices;
-            print("vertex count" + vertexCount);
-            print("triangle count" + triangleCount);
+            // print("vertex count" + vertexCount);
+            // print("triangle count" + triangleCount);
             EdgeGraph edgeGraph = new EdgeGraph(vertexCount, true);
             edgeGraph.InitEdgeGraphDict(vertexCount);
             for (int i = 0; i < triangleCount / 3; i++)
             {
-                percentage = (float)i / (float)triangleCount / 3 - 0.5f;
+                percentage = (float)i / (float)triangleCount / 6;
                 int triangleIndex = i * 3;
 
-                // edgeGraph.addEdge(triangles[triangleIndex], triangles[triangleIndex + 1]);
-                // edgeGraph.addEdge(triangles[triangleIndex + 1], triangles[triangleIndex + 2]);
-                // edgeGraph.addEdge(triangles[triangleIndex + 2], triangles[triangleIndex]);
+                Triangle newTriangle = new Triangle();
+                newTriangle.vertex1 = vertices[triangles[triangleIndex]];
+                newTriangle.vertex2 = vertices[triangles[triangleIndex + 1]];
+                newTriangle.vertex3 = vertices[triangles[triangleIndex + 2]];
 
-                edgeGraph.addEdge(vertices[triangles[triangleIndex]], vertices[triangles[triangleIndex + 1]]);
-                edgeGraph.addEdge(vertices[triangles[triangleIndex + 1]], vertices[triangles[triangleIndex + 2]]);
-                edgeGraph.addEdge(vertices[triangles[triangleIndex + 2]], vertices[triangles[triangleIndex]]);
-
+                edgeGraph.addTriangle(vertices[triangles[triangleIndex]], newTriangle);
+                edgeGraph.addTriangle(vertices[triangles[triangleIndex + 1]], newTriangle);
+                edgeGraph.addTriangle(vertices[triangles[triangleIndex + 2]], newTriangle);
+ 
                 if (systemTimer.ElapsedMilliseconds > nextTime)
                 {
                     nextTime = systemTimer.ElapsedMilliseconds + 500;
@@ -187,7 +299,7 @@ namespace ThreeDModelProcessing
 
             if (path == "")
                 path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-            edgeGraph.OutputDictGraph(path + "/" + graphName);
+            edgeGraph.OutputDictGraph(path + "/" + graphName + extension);
 
             //clear origin data 
             edgeCollection.Clear();
@@ -195,103 +307,94 @@ namespace ThreeDModelProcessing
             // retrive every triangle (triangleCount / 3
             for (int i = 0; i < triangleCount; i += 3)
             {
-                // for (int i = 0; i < 300; i += 3)
-                // {
+
+                percentage = (float)i / (float)triangleCount / 2 + 0.5f;
                 int triangleIndex = i;
                 int vert_0 = triangles[triangleIndex];
                 int vert_1 = triangles[triangleIndex + 1];
                 int vert_2 = triangles[triangleIndex + 2];
 
-                Vector3[] triangleVertices = new Vector3[]{
-                            vertices[vert_0],
-                            vertices[vert_1],
-                            vertices[vert_2]
-                };
+                Triangle currTriangle = new Triangle();
+                currTriangle.vertex1 = vertices[vert_0];
+                currTriangle.vertex2 = vertices[vert_1];
+                currTriangle.vertex3 = vertices[vert_2];
+                Vector3 centerNormal = GetTriangleNormal(currTriangle.toArray());
 
-                Vector3 centerNormal = GetTriangleNormal(triangleVertices);
-                if (centerNormal == Vector3.zero)
-                {
-                    print(triangleIndex + " " + (triangleIndex + 1) + " " + (triangleIndex + 2) + " ");
-                    print(vertices[vert_0].x + "," + vertices[vert_0].y + "," + vertices[vert_0].z + " " +
-                          vertices[vert_1].x + "," + vertices[vert_1].y + "," + vertices[vert_1].z + " " +
-                          vertices[vert_2].x + "," + vertices[vert_2].y + "," + vertices[vert_2].z + " ");
-                }
+                Triangle[] vert_0_adjacentTriList = edgeGraph.getAdjacentTriangleArray(vertices[vert_0]);
+                Triangle[] vert_1_adjacentTriList = edgeGraph.getAdjacentTriangleArray(vertices[vert_1]);
+                Triangle[] vert_2_adjacentTriList = edgeGraph.getAdjacentTriangleArray(vertices[vert_2]);
 
-                Vector3[] vert_0_adjacentList = edgeGraph.getAdjacentVertexArray(vertices[vert_0]);
-                Vector3[] vert_1_adjacentList = edgeGraph.getAdjacentVertexArray(vertices[vert_1]);
-                Vector3[] vert_2_adjacentList = edgeGraph.getAdjacentVertexArray(vertices[vert_2]);
-
-                //compare edge1 (ver0 & vert1)
-                Vector3 edge1_vert = FindSameNumberInGivenArrays(
-                    vert_0_adjacentList, vert_1_adjacentList, triangleVertices[2], vertices[vert_1], vertices[vert_0]);
-                // print(edge1_vert);
-                if (edge1_vert != Vector3.zero)
-                {
+                //Edge 0 - 1
+                Triangle adjacentTriangle1 = FindSameTriangleInGivenArrays(vert_0_adjacentTriList, vert_1_adjacentTriList, currTriangle);
+                if ( adjacentTriangle1 != null){
                     Vector3 adjacentEdgeNormal = GetTriangleNormal(
                         new Vector3[]{
-                            vertices[vert_1],
-                            vertices[vert_0],
-                            edge1_vert
+                            adjacentTriangle1.vertex1,
+                            adjacentTriangle1.vertex2,
+                            adjacentTriangle1.vertex3
                         }
                     );
-
                     float dot_result = Vector3.Dot(adjacentEdgeNormal, centerNormal);
+                    // print("adjacentEdgeNormal"+adjacentEdgeNormal);
+                    bool isEdge = dot_result <= Mathf.Cos(angle * Mathf.Deg2Rad);
+                    if (isEdge)
+                    {
+                        print (dot_result +　" cos : " + Mathf.Cos(angle * Mathf.PI / 180));
+                        edgeCollection.AddEdge(currTriangle.vertex1, currTriangle.vertex2);
+                    }
+                }
 
+                //Edge 0 - 2
+                Triangle adjacentTriangle2 = FindSameTriangleInGivenArrays(vert_0_adjacentTriList, vert_2_adjacentTriList, currTriangle);
+                if ( adjacentTriangle2 != null){
+                    Vector3 adjacentEdgeNormal = GetTriangleNormal(
+                        new Vector3[]{
+                            adjacentTriangle2.vertex1,
+                            adjacentTriangle2.vertex2,
+                            adjacentTriangle2.vertex3
+                        }
+                    );
+                    float dot_result = Vector3.Dot(adjacentEdgeNormal, centerNormal);
+                    // print("adjacentEdgeNormal"+adjacentEdgeNormal);
                     bool isEdge = dot_result <= Mathf.Cos(angle * Mathf.Deg2Rad);
                     if (isEdge)
                     {
                         // print (dot_result +　" cos : " + Mathf.Cos(angle * Mathf.PI / 180));
-                        edgeCollection.AddEdge(triangleVertices[0], triangleVertices[1]);
+                        // edgeCollection.AddEdge(triangleVertices[0], triangleVertices[1]);
+                        edgeCollection.AddEdge(currTriangle.vertex1, currTriangle.vertex3);
                     }
                 }
 
-                //compare edge2 (ver0 & vert2)
-                // Vector3 edge2_vert = FindSameNumberInGivenArrays(
-                //     vert_0_adjacentList, vert_2_adjacentList, triangleVertices[1], vertices[vert_0], vertices[vert_2]);
-                // // print(edge2_vert);
-                // if (edge2_vert != Vector3.zero)
-                // {
-                //     Vector3 adjacentEdgeNormal = GetTriangleNormal(
-                //         new Vector3[]{
-                //             vertices[vert_0],
-                //             vertices[vert_2],
-                //             edge2_vert
-                //         }
-                //     );
-                //     if (Vector3.Dot(adjacentEdgeNormal, centerNormal) <= Mathf.Cos(angle * Mathf.PI / 180))
-                //     {
-                //         edgeCollection.AddEdge(triangleVertices[0], triangleVertices[2]);
-                //     }
-                // }
+                //Edge 1 - 2
+                Triangle adjacentTriangle3 = FindSameTriangleInGivenArrays(vert_1_adjacentTriList, vert_2_adjacentTriList, currTriangle);
+                if ( adjacentTriangle3 != null){
+                    Vector3 adjacentEdgeNormal = GetTriangleNormal(
+                        new Vector3[]{
+                            adjacentTriangle3.vertex1,
+                            adjacentTriangle3.vertex2,
+                            adjacentTriangle3.vertex3
+                        }
+                    );
+                    float dot_result = Vector3.Dot(adjacentEdgeNormal, centerNormal);
+                    // print("adjacentEdgeNormal"+adjacentEdgeNormal);
+                    bool isEdge = dot_result <= Mathf.Cos(angle * Mathf.Deg2Rad);
+                    if (isEdge)
+                    {
+                        edgeCollection.AddEdge(currTriangle.vertex2, currTriangle.vertex3);
+                    }
+                }
 
-                // //compare edge3 (ver1 & vert2)
-                // Vector3 edge3_vert = FindSameNumberInGivenArrays(
-                //     vert_1_adjacentList, vert_2_adjacentList, triangleVertices[0], vertices[vert_2], vertices[vert_1]);
-                // // print(edge3_vert);
-                // if (edge3_vert != Vector3.zero)
-                // {
-                //     Vector3 adjacentEdgeNormal = GetTriangleNormal(
-                //         new Vector3[]{
-                //             vertices[vert_2],
-                //             vertices[vert_1],
-                //             edge3_vert
-                //         }
-                //     );
-                //     if (Vector3.Dot(adjacentEdgeNormal, centerNormal) <= Mathf.Cos(angle * Mathf.PI / 180))
-                //     {
-                //         edgeCollection.AddEdge(triangleVertices[2], triangleVertices[1]);
-                //     }
-                // }
-
-                // if over run time pass for end of frame
+                // // if over run time pass for end of frame
                 if (systemTimer.ElapsedMilliseconds > nextTime)
                 {
                     nextTime = systemTimer.ElapsedMilliseconds + 500;
                     yield return new WaitForEndOfFrame();
                 }
             }
-
-            StreamWriter sw = new StreamWriter(path + "/" + fileName);
+            if (fileName == ""){
+                fileName = transform.parent.gameObject.name + extension;
+            }
+            StreamWriter sw = new StreamWriter(path + "/" + fileName );
             string edgeJSON = JsonUtility.ToJson(edgeCollection);
             sw.Write(edgeJSON);
 
@@ -332,49 +435,36 @@ namespace ThreeDModelProcessing
             return -1;
         }
 
-        static Vector3 FindSameNumberInGivenArrays(Vector3[] arr1, Vector3[] arr2, Vector3 exclude, Vector3 ver1, Vector3 ver2)
-        {
-            var hashSet = new HashSet<Vector3>(arr1);
-            if (arr1.Length <= arr2.Length)
+        static Triangle FindSameTriangleInGivenArrays(Triangle[] triArr1, Triangle[] triArr2, Triangle exclude){
+            var hashSet = new HashSet<Triangle>(triArr1);
+            if (triArr1.Length <= triArr2.Length)
             {
-                hashSet = new HashSet<Vector3>(arr1);
-                for (int i = 0; i < arr1.Length; i++)
+                hashSet = new HashSet<Triangle>(triArr2);
+                for (int i = 0; i < triArr1.Length; i++)
                 {
-                    if (hashSet.Contains(arr2[i]) && arr2[i] != exclude)
-                        hashSet.Add(arr2[i]);
+                    if (hashSet.Contains(triArr1[i]) && !triArr1[i].Equals(exclude))
+                        return triArr1[i];
                 }
             }
             else
             {
-                hashSet = new HashSet<Vector3>(arr2);
-                for (int i = 0; i < arr2.Length; i++)
+                hashSet = new HashSet<Triangle>(triArr1);
+                for (int i = 0; i < triArr2.Length; i++)
                 {
-                    if (hashSet.Contains(arr1[i]) && arr1[i] != exclude)
-                        hashSet.Add(arr1[i]);
+                    if (hashSet.Contains(triArr2[i]) && !triArr2[i].Equals(exclude))
+                        return triArr2[i];
                 }
             }
-
-            //bug here 
-            Vector3 minVector = Vector3.zero;
-            float min = Mathf.Infinity;
-            foreach (var v in hashSet)
-            {
-                float distance = Vector3.Distance(v, ver1) + Vector3.Distance(v, ver2);
-                if (distance < min)
-                {
-                    minVector = v;
-                    min = distance;
-                }
-
-            }
-
-            return minVector;
+            return null;
         }
 
 
 
         IEnumerator method_1_coroutine()
         {
+            if (fileName == ""){
+                fileName = transform.parent.gameObject.name + extension;
+            }
             if (path == "")
                 path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "/" + fileName;
             Stopwatch timer = new Stopwatch();
@@ -424,7 +514,7 @@ namespace ThreeDModelProcessing
 
                     if (sameEdge.Count() < 2) continue;
                     Vector3 adjacent_triangle_normal = triangleNormal[j].normalized;
-                    bool isEdge = Vector3.Dot(adjacent_triangle_normal, normal) <= Mathf.Cos(angle * Mathf.PI / 180);
+                    bool isEdge = Vector3.Dot(adjacent_triangle_normal, normal) <= Mathf.Cos(angle * Mathf.Deg2Rad);
                     if (isEdge)
                     {
                         edgeCollection.AddEdge(sameEdge[0], sameEdge[1]);
@@ -487,14 +577,15 @@ namespace ThreeDModelProcessing
             if (GUI.Button(btn, "method 1"))
             {
                 // method_1();
-                StartCoroutine(method_1_coroutine());
+                // StartCoroutine(method_1_coroutine());
+                StartCoroutine(method_1_optimize_coroutine());
             }
 
             Rect btn2 = new Rect(250, 50, 150, 50);
-            if (GUI.Button(btn2, "method 1 optimize"))
+            if (GUI.Button(btn2, "method 2 "))
             {
                 // method_1();
-                StartCoroutine(method_1_optimize_coroutine());
+                 StartCoroutine(method_2_optimize_coroutine());
             }
 
             GUI.Label(new Rect(50, 100, 150, 50), "Loading : " + percentage * 100 + "%");

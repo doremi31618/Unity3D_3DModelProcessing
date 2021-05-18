@@ -8,11 +8,13 @@ using ThreeDModelProcessing;
 public class EdgeReader : MonoBehaviour
 {
     public string fileName = "edgeData.txt";
+    public string graphFileName = "edgeGraph.txt";
     public string readFrom = "";
     // public List<Edge> edgeList = new List<Edge>();
     public EdgeRawData edgeList;
-     [Range(0.001f, 0.01f)]public float scale = 0.01f;
-     public Color color;
+    public EdgeGraph edgeGraph;
+    [Range(0.001f, 0.01f)]public float scale = 0.01f;
+    public Color color;
     void ReadEdge(string path)
     {
 
@@ -32,6 +34,16 @@ public class EdgeReader : MonoBehaviour
 
     }
 
+    void ConnectEdgeGraph(string path){
+        if (path == "")
+        {
+            path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "/" + graphFileName;
+        }
+        edgeGraph = EdgeGraph.ConvertEdgeRawDataToGraph(edgeList);
+        edgeGraph.OutputDictGraph(path);
+    }
+
+
     void OnGUI()
     {
         Rect btn = new Rect(50, 150, 150, 50);
@@ -43,15 +55,6 @@ public class EdgeReader : MonoBehaviour
 
     void OnDrawGizmos()
     {
-        // if (edgeList.Count < 1) return;
-        // foreach (var e in edgeList)
-        // {
-        //     Vector3 direction = e.edgeVertex[1] - e.edgeVertex[0];
-        //     Gizmos.DrawRay(e.edgeVertex[0], direction);
-
-        //     Gizmos.DrawSphere(transform.TransformPoint(e.edgeVertex[0]), 0.01f);
-        //     Gizmos.DrawSphere(transform.TransformPoint(e.edgeVertex[1]), 0.01f);
-        // }
         Gizmos.color = color;
         foreach (var edge in edgeList.edges)
         {

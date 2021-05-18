@@ -7,14 +7,46 @@ using System.Linq;
 // using System.Text;
 namespace ThreeDModelProcessing
 {
+    public class Triangle
+    {
+        public Vector3 vertex1;
+        public Vector3 vertex2;
+        public Vector3 vertex3;
+
+        public Vector3[] toArray()
+        {
+            return new Vector3[] { vertex1, vertex2, vertex3 };
+        }
+
+        public Vector3 normal
+        {
+            get
+            {
+                return Vector3.Cross((vertex2 - vertex1).normalized, (vertex3 - vertex1).normalized);
+
+            }
+        }
+
+        public Vector3[] edgeExcludeVertex(Vector3 vertex){
+            if (vertex == vertex1)
+                return new Vector3[]{vertex2, vertex3};
+            else if (vertex == vertex2)
+                return new Vector3[]{vertex1, vertex3};
+            else if (vertex == vertex3)
+                return new Vector3[]{vertex1, vertex2};
+            else 
+                return null; 
+        }
+    }
     [Serializable]
     public class EdgeGraph
     {
         public int nodeNumber = 0;
         public List<int>[] graph;
         public List<int>[] getGraph { get { return graph; } }
-
+        public Dictionary<Vector3, Vector3> normalGraph;
         public Dictionary<Vector3, List<Vector3>> vertexGraph;
+        public Dictionary<Vector3, List<Triangle>> triangleGraph;
 
         public EdgeGraph(int number, bool isUseDict)
         {
@@ -48,12 +80,8 @@ namespace ThreeDModelProcessing
         {
             nodeNumber = number;
             vertexGraph = new Dictionary<Vector3, List<Vector3>>();
-
-            // for (int i = 0; i < number; i++)
-            // {
-            //     var item = vertexGraph.ElementAt(i);
-            //     vertexGraph[item.Key] =  new List<Vector3>();
-            // }
+            triangleGraph = new Dictionary<Vector3, List<Triangle>>();
+            normalGraph = new Dictionary<Vector3, Vector3>();
         }
 
 
@@ -88,6 +116,25 @@ namespace ThreeDModelProcessing
             }
 
         }
+        public void addTriangle(Vector3 vertex, Triangle triangle)
+        {
+            if (!triangleGraph.ContainsKey(vertex))
+            {
+                triangleGraph.Add(vertex, new List<Triangle>());
+                triangleGraph[vertex].Add(triangle);
+            }
+            else if (!triangleGraph[vertex].Contains(triangle))
+            {
+                triangleGraph[vertex].Add(triangle);
+            }
+        }
+
+        public void addNormal (Vector3 vertex, Vector3 normal){
+            if (!normalGraph.ContainsKey(vertex))
+            {
+                normalGraph[vertex] = normal;
+            }
+        }
 
         public void addEdge(int u, int v)
         {
@@ -119,10 +166,11 @@ namespace ThreeDModelProcessing
             foreach (var node in vertexGraph)
             {
                 string content = node.Key + " | ";
-                foreach(var adj in node.Value){
+                foreach (var adj in node.Value)
+                {
                     content += adj.ToString() + " ";
                 }
-                
+
                 sw.WriteLine(content);
             }
 
@@ -148,6 +196,40 @@ namespace ThreeDModelProcessing
         {
             return vertexGraph[vertex];
         }
+
+        public Triangle[] getAdjacentTriangleArray(Vector3 vertex)
+        {
+            return triangleGraph[vertex].ToArray();
+        }
+
+        public List<Triangle> getAdjacentTriangleList(Vector3 vertex)
+        {
+            return triangleGraph[vertex];
+        }
+
+        public Vector3 getVertexAverageNormal(Vector3 vertex){
+            return normalGraph[vertex];
+        }
+
+        public static EdgeGraph ConvertEdgeRawDataToGraph(EdgeRawData rawData)
+        {
+            int nodeNum = rawData.getVertexNumber;
+            EdgeGraph newGraph = new EdgeGraph(nodeNum, true);
+            newGraph.InitEdgeGraphDict(nodeNum);
+            for (int i = 0; i < rawData.getEdgeNumber; i++)
+            {
+                //get edge data 
+                Vector2Int edgeIndex = rawData.getEdge(i);
+
+                //get edge vertex   
+                Vector3 edgeVertex1 = rawData.getVertex(edgeIndex.x);
+                Vector3 edgeVertex2 = rawData.getVertex(edgeIndex.y);
+
+                //save to graph
+                newGraph.addEdge(edgeVertex1, edgeVertex2);
+            }
+            return newGraph;
+        }
     }
 
 
@@ -172,6 +254,11 @@ namespace ThreeDModelProcessing
         public Vector2Int getEdge(int index)
         {
             return edges[index];
+        }
+
+        public Vector3 getVertex(int index)
+        {
+            return vertices[index];
         }
 
         public void AddEdge(Vector3 head, Vector3 tail)
@@ -205,7 +292,8 @@ namespace ThreeDModelProcessing
                 edges.Add(new Vector2Int(headIndex, tailIndex));
             }
 
-            if (isContainTail && isContainHead){
+            if (isContainTail && isContainHead)
+            {
                 edges.Add(new Vector2Int(headIndex, tailIndex));
             }
 
