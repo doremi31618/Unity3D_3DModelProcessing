@@ -50,4 +50,8 @@
     <h2>Intro</h2>
     <p> a practice demo that show how to Find Edge of model when the angle between two normal of triangle</p>
     <img src="img/findedge.png">
+    <h1>Mesh Simplify</h1>
+    <h2>Intro</h2>
+    <p> a tool that simplify obj file automatically</p>
+    <img src="img/MeshSimplify.png">
 </div>
