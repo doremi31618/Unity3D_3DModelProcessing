@@ -27,15 +27,16 @@ namespace ThreeDModelProcessing
             }
         }
 
-        public Vector3[] edgeExcludeVertex(Vector3 vertex){
+        public Vector3[] edgeExcludeVertex(Vector3 vertex)
+        {
             if (vertex == vertex1)
-                return new Vector3[]{vertex2, vertex3};
+                return new Vector3[] { vertex2, vertex3 };
             else if (vertex == vertex2)
-                return new Vector3[]{vertex1, vertex3};
+                return new Vector3[] { vertex1, vertex3 };
             else if (vertex == vertex3)
-                return new Vector3[]{vertex1, vertex2};
-            else 
-                return null; 
+                return new Vector3[] { vertex1, vertex2 };
+            else
+                return null;
         }
     }
     [Serializable]
@@ -84,7 +85,6 @@ namespace ThreeDModelProcessing
             normalGraph = new Dictionary<Vector3, Vector3>();
         }
 
-
         public void addEdge(Vector3 vertex, Vector3 adjacentPoint)
         {
 
@@ -129,7 +129,8 @@ namespace ThreeDModelProcessing
             }
         }
 
-        public void addNormal (Vector3 vertex, Vector3 normal){
+        public void addNormal(Vector3 vertex, Vector3 normal)
+        {
             if (!normalGraph.ContainsKey(vertex))
             {
                 normalGraph[vertex] = normal;
@@ -207,9 +208,25 @@ namespace ThreeDModelProcessing
             return triangleGraph[vertex];
         }
 
-        public Vector3 getVertexAverageNormal(Vector3 vertex){
+
+        public Vector3 getVertexAverageNormal(Vector3 vertex)
+        {
             return normalGraph[vertex];
         }
+
+        public Vector3 caculateVertexAverageNoraml(Vector3 vertex)
+        {
+            List<Triangle> adjacentTriangleList = getAdjacentTriangleList(vertex);
+            Vector3 averageNormal = Vector3.zero;
+            int triangleNumber = adjacentTriangleList.Count;
+            foreach (var tri in adjacentTriangleList)
+            {
+                averageNormal += tri.normal / triangleNumber;
+            }
+            return averageNormal;
+        }
+
+
 
         public static EdgeGraph ConvertEdgeRawDataToGraph(EdgeRawData rawData)
         {
@@ -227,6 +244,40 @@ namespace ThreeDModelProcessing
 
                 //save to graph
                 newGraph.addEdge(edgeVertex1, edgeVertex2);
+
+            }
+            return newGraph;
+        }
+
+        public static EdgeGraph ConvertEdgeRawDataToGraph(EdgeRawData rawData, bool isSaveNormal)
+        {
+            if (!isSaveNormal || (rawData.normals == null))
+            {
+                return ConvertEdgeRawDataToGraph(rawData);
+            }
+            else if (rawData.normals.Count == 0)
+                return ConvertEdgeRawDataToGraph(rawData);
+
+            int nodeNum = rawData.getVertexNumber;
+            EdgeGraph newGraph = new EdgeGraph(nodeNum, true);
+            newGraph.InitEdgeGraphDict(nodeNum);
+            for (int i = 0; i < rawData.getEdgeNumber; i++)
+            {
+                //get edge data 
+                Vector2Int edgeIndex = rawData.getEdge(i);
+
+                //get edge vertex   
+                Vector3 edgeVertex1 = rawData.getVertex(edgeIndex.x);
+                Vector3 edgeVertex2 = rawData.getVertex(edgeIndex.y);
+
+                Vector3 vertexNormal1 = rawData.normals[edgeIndex.x];
+                Vector3 vertexNormal2 = rawData.normals[edgeIndex.y];
+
+                //save to graph
+                newGraph.addEdge(edgeVertex1, edgeVertex2);
+                newGraph.addNormal(edgeVertex1, vertexNormal1);
+                newGraph.addNormal(edgeVertex2, vertexNormal2);
+
             }
             return newGraph;
         }
@@ -236,13 +287,17 @@ namespace ThreeDModelProcessing
     [Serializable]
     public class EdgeRawData
     {
+
         public List<Vector3> vertices;
         public List<Vector2Int> edges;
         public int getVertexNumber { get { return vertices.Count; } }
         public int getEdgeNumber { get { return edges.Count; } }
+        // public List<Vector3> getNormals {get {return normals;}}
+        public List<Vector3> normals;
 
         public EdgeRawData()
         {
+
             vertices = new List<Vector3>();
             edges = new List<Vector2Int>();
         }
@@ -296,10 +351,37 @@ namespace ThreeDModelProcessing
             {
                 edges.Add(new Vector2Int(headIndex, tailIndex));
             }
+        }
 
+        public void AddNormal(List<Vector3> _normals)
+        {
+            if (normals != null)
+                normals.Clear();
+            else
+                normals = new List<Vector3>();
+            normals.AddRange(_normals);
+        }
 
+        public void SaveFile(string path)
+        {
+            StreamWriter sw = new StreamWriter(path);
+            string edgeJSON = JsonUtility.ToJson(this);
+            sw.Write(edgeJSON);
+            sw.Close();
+
+            Debug.Log("save edge raw data to " + path);
+        }
+
+        public static EdgeRawData ReadFile(string path)
+        {
+            StreamReader sr = new StreamReader(path);
+            string jsonContent = sr.ReadToEnd();
+            sr.Close();
+            return JsonUtility.FromJson<EdgeRawData>(jsonContent);
         }
     }
+
+
     [Serializable]
     public class SimplifyModelData
     {

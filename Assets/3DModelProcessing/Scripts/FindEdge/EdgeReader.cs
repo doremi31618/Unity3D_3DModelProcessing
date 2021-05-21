@@ -7,24 +7,30 @@ using ThreeDModelProcessing;
 
 public class EdgeReader : MonoBehaviour
 {
+    public string extension = ".txt";
     public string fileName = "edgeData.txt";
     public string graphFileName = "edgeGraph.txt";
     public string readFrom = "";
     // public List<Edge> edgeList = new List<Edge>();
-    public EdgeRawData edgeList;
-    public EdgeGraph edgeGraph;
-    [Range(0.001f, 0.01f)]public float scale = 0.01f;
-    public Color color;
+    [HideInInspector]public EdgeRawData edgeList;
+    [HideInInspector]public EdgeGraph edgeGraph;
+    public bool isShowGizmos = true;
+    public bool isDrawNormals = false;
+    [Range(0.001f, 0.01f)] public float scale = 0.01f;
+    [Range( 0.001f,0.1f)] public float normalLength = 0.01f;
+    public Color edgeColor;
     void ReadEdge(string path)
     {
-
+        string wholePath = "";
         if (path == "")
         {
-            path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "/" + fileName;
+            readFrom = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+            wholePath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "/" + fileName + extension;
         }
-        StreamReader sr = new StreamReader(path);
-        string jsonContent = sr.ReadToEnd();
-        edgeList = JsonUtility.FromJson<EdgeRawData>(jsonContent);
+        else{
+            wholePath = readFrom + "/" + fileName + extension;
+        }
+        edgeList = EdgeRawData.ReadFile(wholePath);
 
         // while (sr.Peek() >= 0)
         // {
@@ -34,12 +40,13 @@ public class EdgeReader : MonoBehaviour
 
     }
 
-    void ConnectEdgeGraph(string path){
+    void ConnectEdgeGraph(string path)
+    {
         if (path == "")
         {
-            path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "/" + graphFileName;
+            path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "/" + graphFileName + extension;
         }
-        edgeGraph = EdgeGraph.ConvertEdgeRawDataToGraph(edgeList);
+        edgeGraph = EdgeGraph.ConvertEdgeRawDataToGraph(edgeList, true);
         edgeGraph.OutputDictGraph(path);
     }
 
@@ -55,16 +62,24 @@ public class EdgeReader : MonoBehaviour
 
     void OnDrawGizmos()
     {
-        Gizmos.color = color;
+        if (!isShowGizmos)return;
+        
+        Gizmos.color = edgeColor;
         foreach (var edge in edgeList.edges)
         {
-            Vector3 head = edgeList.vertices[edge.x];
-            Vector3 tail = edgeList.vertices[edge.y];
+            Vector3 head = transform.TransformPoint(edgeList.vertices[edge.x]);
+            Vector3 tail = transform.TransformPoint(edgeList.vertices[edge.y]);
 
-            Gizmos.DrawLine(transform.TransformPoint(head), transform.TransformPoint(tail));
+            Gizmos.DrawLine(head, tail);
 
-            Gizmos.DrawSphere(transform.TransformPoint(head), scale);
-            Gizmos.DrawSphere(transform.TransformPoint(tail), scale);
+            Gizmos.DrawSphere(head, scale);
+            Gizmos.DrawSphere(tail, scale);
+
+            if (!isDrawNormals)continue;
+            Gizmos.DrawLine(head, transform.TransformPoint(edgeList.vertices[edge.x] + edgeList.normals[edge.x] * normalLength));
+            Gizmos.DrawLine(tail, transform.TransformPoint(edgeList.vertices[edge.y] + edgeList.normals[edge.y] * normalLength));
         }
+
+       
     }
 }

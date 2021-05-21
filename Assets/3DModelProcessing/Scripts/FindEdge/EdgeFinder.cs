@@ -23,6 +23,7 @@ namespace ThreeDModelProcessing
         [Tooltip("Catch edge when angle between two normal is more bigger than this")]
         [Range(10, 90)] public float angle = 25f;
         [Range(0.001f, 0.01f)] public float scale = 0.01f;
+        public bool isUseGUI = false;
         public Color color = Color.white;
         public string path = "";
         public string extension = ".txt";
@@ -37,6 +38,8 @@ namespace ThreeDModelProcessing
         Mesh mesh;
         // List<Edge> edgeList = new List<Edge>();
         EdgeRawData edgeCollection = new EdgeRawData();
+        EdgeGraph edgeGraph;
+        public EdgeGraph getEdgeGraph{get{return edgeGraph;}}
 
         float percentage = 0;
 
@@ -151,7 +154,7 @@ namespace ThreeDModelProcessing
             print(String.Join(",", mesh.vertices));
             print(String.Join(",", mesh.triangles));
         }
-
+        #region method 2
         IEnumerator method_2_optimize_coroutine(){
             Stopwatch systemTimer = new Stopwatch();
             float nextTime = 500;
@@ -166,7 +169,7 @@ namespace ThreeDModelProcessing
             vertices = meshFilter.mesh.vertices;
             // print("vertex count" + vertexCount);
             // print("triangle count" + triangleCount);
-            EdgeGraph edgeGraph = new EdgeGraph(vertexCount, true);
+            edgeGraph = new EdgeGraph(vertexCount, true);
             edgeGraph.InitEdgeGraphDict(vertexCount);
             for (int i = 0; i < triangleCount / 3; i++)
             {
@@ -201,12 +204,7 @@ namespace ThreeDModelProcessing
                 percentage = ((float)i / (float)vertexCount)/4 + 0.5f;
                 //Get Vertex
                 Vector3 vertex = vertices[i];
-                Vector3 averageNormal = Vector3.zero;
-                List<Triangle> adjacentTriangle = edgeGraph.getAdjacentTriangleList(vertex);
-                int count = adjacentTriangle.Count;
-                foreach(var tri in adjacentTriangle){
-                    averageNormal += tri.normal / count;
-                }
+                Vector3 averageNormal = edgeGraph.caculateVertexAverageNoraml(vertex);
                 edgeGraph.addNormal(vertex, averageNormal);
 
                 if (systemTimer.ElapsedMilliseconds > nextTime)
@@ -257,8 +255,10 @@ namespace ThreeDModelProcessing
                 }
             }
 
-
+            edgeGraph = EdgeGraph.ConvertEdgeRawDataToGraph(edgeCollection, true);
         }
+         
+        #endregion //method 2 end
         IEnumerator method_1_optimize_coroutine()
         {
             Stopwatch systemTimer = new Stopwatch();
@@ -274,7 +274,7 @@ namespace ThreeDModelProcessing
             vertices = meshFilter.mesh.vertices;
             // print("vertex count" + vertexCount);
             // print("triangle count" + triangleCount);
-            EdgeGraph edgeGraph = new EdgeGraph(vertexCount, true);
+            edgeGraph = new EdgeGraph(vertexCount, true);
             edgeGraph.InitEdgeGraphDict(vertexCount);
             for (int i = 0; i < triangleCount / 3; i++)
             {
@@ -290,6 +290,21 @@ namespace ThreeDModelProcessing
                 edgeGraph.addTriangle(vertices[triangles[triangleIndex + 1]], newTriangle);
                 edgeGraph.addTriangle(vertices[triangles[triangleIndex + 2]], newTriangle);
  
+                if (systemTimer.ElapsedMilliseconds > nextTime)
+                {
+                    nextTime = systemTimer.ElapsedMilliseconds + 500;
+                    yield return new WaitForEndOfFrame();
+                }
+            }
+
+            //Build normal graph 
+            for(int i=0; i< vertexCount; i++){
+                percentage = ((float)i / (float)vertexCount)/4 + 0.5f;
+                //Get Vertex
+                Vector3 vertex = vertices[i];
+                Vector3 averageNormal = edgeGraph.caculateVertexAverageNoraml(vertex);
+                edgeGraph.addNormal(vertex, averageNormal);
+
                 if (systemTimer.ElapsedMilliseconds > nextTime)
                 {
                     nextTime = systemTimer.ElapsedMilliseconds + 500;
@@ -391,14 +406,21 @@ namespace ThreeDModelProcessing
                     yield return new WaitForEndOfFrame();
                 }
             }
+            List<Vector3> _normals = new List<Vector3>();
+            foreach (var edgeVertex in edgeCollection.vertices){
+                _normals.Add(edgeGraph.getVertexAverageNormal(edgeVertex));
+                if (systemTimer.ElapsedMilliseconds > nextTime)
+                {
+                    nextTime = systemTimer.ElapsedMilliseconds + 500;
+                    yield return new WaitForEndOfFrame();
+                }
+            }
+            edgeCollection.AddNormal(_normals);
+
             if (fileName == ""){
                 fileName = transform.parent.gameObject.name + extension;
             }
-            StreamWriter sw = new StreamWriter(path + "/" + fileName );
-            string edgeJSON = JsonUtility.ToJson(edgeCollection);
-            sw.Write(edgeJSON);
-
-            sw.Close();
+            edgeCollection.SaveFile(path + "/" + fileName);
             systemTimer.Stop();
 
             print("vertices count : " + mesh.vertexCount + " triangle count : " + mesh.triangles.Length);
@@ -458,92 +480,6 @@ namespace ThreeDModelProcessing
             return null;
         }
 
-
-
-        IEnumerator method_1_coroutine()
-        {
-            if (fileName == ""){
-                fileName = transform.parent.gameObject.name + extension;
-            }
-            if (path == "")
-                path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "/" + fileName;
-            Stopwatch timer = new Stopwatch();
-            StreamWriter sw = new StreamWriter(path);
-
-            timer.Start();
-            long nextTime = timer.ElapsedMilliseconds + 1000;
-            int triangleCount = GetTrianglesArrayLength;
-            //Step1 find triangle normal list 
-            Vector3[] triangleNormal = GetTriangleNormalCollection(triangleCount);
-
-            //!!! very time comsuming 
-            //absolutely need to optimize
-            //Step2 find edge list
-            // List<Edge> edgeList = new List<Edge>();
-            for (int i = 0; i < triangleCount; i++)
-            {
-                int[] sortIndex = GetTriangle(i);
-                Vector3[] triVertex = GetTriangleVertex(sortIndex);
-                // Array.Sort(sortIndex);
-
-                //finding adjacent faces in mesh
-                int adjacent_triangle_num = 0;
-                Vector3 normal = triangleNormal[i].normalized;
-
-                percentage = (float)i / (float)triangleCount;
-
-                //traverse all triangle to find the adjacent triangle
-                for (int j = i + 1; j < triangleCount; j++)
-                {
-                    if (adjacent_triangle_num == 3) break;
-
-                    int[] adjacent_index_clone = GetTriangle(j);
-                    Vector3[] adjacentTriVertex = GetTriangleVertex(adjacent_index_clone);
-
-                    List<Vector3> sameEdge = new List<Vector3>();
-                    for (int x = 0; x < 3; x++)
-                    {
-                        for (int y = 0; y < 3; y++)
-                        {
-                            if (triVertex[x] == adjacentTriVertex[y])
-                            {
-                                sameEdge.Add(triVertex[x]);
-                            }
-                        }
-                    }
-
-                    if (sameEdge.Count() < 2) continue;
-                    Vector3 adjacent_triangle_normal = triangleNormal[j].normalized;
-                    bool isEdge = Vector3.Dot(adjacent_triangle_normal, normal) <= Mathf.Cos(angle * Mathf.Deg2Rad);
-                    if (isEdge)
-                    {
-                        edgeCollection.AddEdge(sameEdge[0], sameEdge[1]);
-                        // Edge edge = new Edge(sameEdge.ToArray());
-                        // edgeList.Add(edge);
-
-
-                    }
-                    if (timer.ElapsedMilliseconds > nextTime)
-                    {
-                        print("Process time : " + timer.ElapsedMilliseconds);
-                        yield return new WaitForEndOfFrame();
-                        nextTime = timer.ElapsedMilliseconds + 200;
-                    }
-
-                }
-            }
-
-            string edgeJSON = JsonUtility.ToJson(edgeCollection);
-            sw.Write(edgeJSON);
-
-            sw.Close();
-            timer.Stop();
-
-            print("vertices count : " + mesh.vertexCount + " triangle count : " + mesh.triangles.Length);
-            print(timer.Elapsed.Minutes + ", " + timer.Elapsed.Seconds + ", " + timer.Elapsed.Milliseconds);
-            yield return new WaitForEndOfFrame();
-        }
-
         void Awake()
         {
             meshFilter = GetComponent<MeshFilter>();
@@ -573,6 +509,7 @@ namespace ThreeDModelProcessing
 
         void OnGUI()
         {
+            if (!isUseGUI)return;
             Rect btn = new Rect(50, 50, 150, 50);
             if (GUI.Button(btn, "method 1"))
             {

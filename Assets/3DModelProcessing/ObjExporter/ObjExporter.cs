@@ -17,6 +17,7 @@ struct ObjMaterial {
     public string textureName;
 }
 
+#if UNITY_EDITOR
 public class ObjExporter : ScriptableObject {
     private static int vertexOffset = 0;
     private static int normalOffset = 0;
@@ -258,3 +259,4 @@ public class ObjExporter : ScriptableObject {
         return s;
     }
 }
+#endif

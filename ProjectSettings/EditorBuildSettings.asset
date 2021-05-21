@@ -4,5 +4,8 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/3DModelProcessing/Scenes/MeshSimplify.unity
+    guid: 3e6adfb51640040c8b754c07a55f867e
   m_configObjects: {}

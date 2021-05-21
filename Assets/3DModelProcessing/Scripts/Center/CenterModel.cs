@@ -29,17 +29,33 @@ public class CenterModel : MonoBehaviour
         }
 
         for(int i=0; i<vertices.Length; i++){
-            vertices[i] -= meanPosition;
+            vertices[i] += meanPosition;
+        }
+        print(meanPosition);
+        mesh.vertices = vertices;
+    }
+
+    public static void CenterObject(MeshFilter meshFilter, MeshRenderer renderer){
+        Vector3[] vertices = meshFilter.mesh.vertices;
+        Vector3 meanPosition = Vector3.zero;
+
+        foreach(var p in vertices){
+            meanPosition += p / vertices.Length;
         }
 
-        mesh.vertices = vertices;
+        for(int i=0; i<vertices.Length; i++){
+            vertices[i] -= meanPosition;
+        }
+        meshFilter.mesh.vertices = vertices;
     }
 
     void Awake(){
         meshFilter = GetComponent<MeshFilter>();
-        Center();
+        // Center();
     }
     void OnEnable(){
-        Center();
+        // Center();
+        CenterObject(GetComponent<MeshFilter>().mesh);
+        print(GetComponent<MeshRenderer>().bounds.center);
     }
 }

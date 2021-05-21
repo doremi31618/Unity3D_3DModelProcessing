@@ -4,7 +4,9 @@ using UnityEngine;
 using ThreeDModelProcessing;
 public class EdgeDataOptimizer : MonoBehaviour
 {
-
+    static void Optimize(EdgeRawData rawData){
+        
+    }
 
     
 }
