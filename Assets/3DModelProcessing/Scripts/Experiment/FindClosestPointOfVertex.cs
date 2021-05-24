@@ -8,30 +8,30 @@ public class FindClosestPointOfVertex : MonoBehaviour
 {
     public Vector3 point;
     [Range(0.001f, 0.01f)] public float scale = 0.005f;
-    EdgeGraph edgeGraph;
+    // EdgeGraph edgeGraph;
 
-    void GetClosestEdge(){
+    // void GetClosestEdge(){
 
-        if (Input.GetMouseButtonDown(0)){
-            RaycastHit hit;
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+    //     if (Input.GetMouseButtonDown(0)){
+    //         RaycastHit hit;
+    //         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
-            if (Physics.Raycast(ray, out hit)){
-                point = hit.point;
+    //         if (Physics.Raycast(ray, out hit)){
+    //             point = hit.point;
 
-                if (hit.transform.GetComponent<EdgeFinder>() != null){
-                    edgeGraph = GetComponent<EdgeFinder>().getEdgeGraph;
-                }
-            }
+    //             if (hit.transform.GetComponent<EdgeFinder>() != null){
+    //                 edgeGraph = GetComponent<EdgeFinder>().getEdgeGraph;
+    //             }
+    //         }
 
-        }
+    //     }
         
-        if ( edgeGraph == null)return;
+    //     if ( edgeGraph == null)return;
 
 
         
         
-    }
+    // }
     void OnMouseDown()
     {
         // print("MouseDown");

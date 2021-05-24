@@ -5,11 +5,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Threading.Tasks;
 using System.Diagnostics;
+using ThreeDModelProcessing.Utility;
 using System.IO;
-namespace ThreeDModelProcessing
+namespace ThreeDModelProcessing.Edge
 {
-
-
     /// <summary>
     /// the mehtod of this script is based from paper below: 
     /// 1. [Extraction of blufflines from 2.5 dimensional Delaunay triangle mesh using LiDAR data]
@@ -17,143 +16,53 @@ namespace ThreeDModelProcessing
     /// 2. [Comparing efficient data structures to represent geometric models for three-dimensional virtual medical training]
     ///    https://www.sciencedirect.com/science/article/pii/S153204641630096X
     /// </summary>
-    [RequireComponent(typeof(MeshFilter))]
+    [RequireComponent(typeof(MeshFilter), typeof(EdgeData))]
     public class EdgeFinder : MonoBehaviour
     {
         [Tooltip("Catch edge when angle between two normal is more bigger than this")]
         [Range(10, 90)] public float angle = 25f;
         [Range(0.001f, 0.01f)] public float scale = 0.01f;
-        public bool isUseGUI = false;
+
         public Color color = Color.white;
         public string path = "";
-        public string extension = ".txt";
-        public string fileName = "edgeData";
-        public string graphName = "edgeGraph";
+        public bool isUseGUI {get{return edgeData.isUseGUI;}}
+        public bool isDrawGizmos {get{return edgeData.isDrawGizmos;}}
+        public string extension { get { return edgeData.extension; } set { edgeData.extension = value; } }
+        public string fileName { get { return edgeData.fileName; } set { edgeData.fileName = value; } }
+        public string graphName { get { return edgeData.graphName; } set { edgeData.graphName = value; } }
         int[] _triangle;
         Vector3[] vertices;
 
 
         //attributes
-        MeshFilter meshFilter;
-        Mesh mesh;
-        // List<Edge> edgeList = new List<Edge>();
-        public EdgeRawData edgeCollection = new EdgeRawData();
-        EdgeGraph edgeGraph;
-        public EdgeGraph getEdgeGraph { get { return edgeGraph; } }
-
-        float percentage = 0;
-
-        //could encapsulation to a class later
-        //tool method 
-        int GetTrianglesArrayLength
+        EdgeData edgeData
         {
             get
             {
-                return mesh.triangles.Length / 3;
+                return GetComponent<EdgeData>();
             }
         }
-        Vector3 GetVertex(int index)
+        MeshFilter meshFilter;
+        Mesh mesh;
+        // List<Edge> edgeList = new List<Edge>();
+        public EdgeRawData edgeCollection
         {
-            return mesh.vertices[index];
-        }
-
-        int[] GetTriangle(int index)
-        {
-            return new int[]{
-            mesh.triangles[index*3],
-            mesh.triangles[index*3+1],
-            mesh.triangles[index*3+2]};
-        }
-
-        Vector3[] GetTriangleVertex(int[] indices)
-        {
-            return new Vector3[]{
-            mesh.vertices[indices[0]],
-            mesh.vertices[indices[1]],
-            mesh.vertices[indices[2]]};
-        }
-
-        Vector3[] GetTriangleNormalCollection(int length)
-        {
-            Vector3[] triangleNormal = new Vector3[length];
-            //traverse all the triangle
-            for (int i = 0; i < length; i++)
+            get
             {
-                //calculate triangle data
-                int[] triangleIndex = GetTriangle(i);
-                Vector3[] triangleVertex = GetTriangleVertex(triangleIndex);
-                triangleNormal[i] = GetTriangleNormal(triangleVertex);
-                // print(triangleNormal[i] .normalized);
+                if (edgeData.edgeCollection == null)
+                    edgeData.edgeCollection = new EdgeRawData();
+                return edgeData.edgeCollection;
             }
-            return triangleNormal;
+            set { edgeData.edgeCollection = value; }
         }
-
-        Vector3 GetTriangleNormal(Vector3[] vertices)
+        public EdgeGraph edgeGraph
         {
-            // print("============GetTriangleNormal Input Vector===========");
-            // print(vertices[0]*10000);
-            // print(vertices[1]*10000);
-            // print(vertices[2]*10000);
-            Vector3 vert1 = vertices[1] * 10000 - vertices[0] * 10000;
-            Vector3 vert2 = vertices[2] * 10000 - vertices[0] * 10000;
-            // print("============substract===========");
-            // print(vert1);
-            // print(vert2);
-            Vector3 crossProduct = Vector3.Cross(vert1.normalized, vert2.normalized).normalized;
-            // print("Cross"+crossProduct);
-            return crossProduct;
+            get { return edgeData.edgeGraph; }
+            set { edgeData.edgeGraph = value; }
         }
+        // public EdgeGraph getEdgeGraph { get { return edgeGraph; } }
 
-        Vector3 GetTriangleCenter(Vector3[] vertices)
-        {
-            Vector3 center = Vector3.zero;
-            foreach (var v in vertices)
-            {
-                center += v / 3;
-            }
-            return center;
-
-        }
-
-        void GenerateProceduralMesh()
-        {
-            Mesh mesh = new Mesh();
-            Vector3[] vertices = new Vector3[]{
-            new Vector3(1,-1, 1),
-            new Vector3(1,-1,-1),
-            new Vector3(1, 1,-1),
-            new Vector3(1, 1, 1),
-            new Vector3(-1, -1, 1),
-            new Vector3(-1, -1, -1),
-            new Vector3(-1, 1, -1),
-            new Vector3(-1, 1, 1)
-            };
-            int[] triangle = new int[]{
-            4,0,3,
-            4,3,7,
-            0,1,2,
-            0,2,3,
-            1,5,6,
-            1,6,2,
-            5,4,7,
-            5,7,6,
-            7,3,2,
-            7,2,6,
-            0,5,1,
-            0,4,5
-            };
-            mesh.vertices = vertices;
-            mesh.triangles = triangle;
-
-            GetComponent<MeshFilter>().mesh = mesh;
-
-        }
-        void PrintMeshData()
-        {
-            print("Dot product" + Vector3.Dot(new Vector3(0, 0, 0), new Vector3(0, 1, 0)));
-            print(String.Join(",", mesh.vertices));
-            print(String.Join(",", mesh.triangles));
-        }
+        float percentage = 0;
         #region method 2
         IEnumerator method_2_optimize_coroutine()
         {
@@ -343,7 +252,8 @@ namespace ThreeDModelProcessing
 
             if (path == "")
                 path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-            edgeGraph.OutputDictGraph(path + "/" + graphName + extension);
+            edgeData.wholeGraphPath = path + "/" + graphName + extension;
+            edgeGraph.OutputDictGraph(edgeData.wholeGraphPath);
 
             //clear origin data 
             edgeCollection.Clear();
@@ -362,7 +272,7 @@ namespace ThreeDModelProcessing
                 currTriangle.vertex1 = vertices[vert_0];
                 currTriangle.vertex2 = vertices[vert_1];
                 currTriangle.vertex3 = vertices[vert_2];
-                Vector3 centerNormal = GetTriangleNormal(currTriangle.toArray());
+                Vector3 centerNormal = MeshUtility.GetTriangleNormal(mesh, currTriangle.toArray());
 
                 Triangle[] vert_0_adjacentTriList = edgeGraph.getAdjacentTriangleArray(vertices[vert_0]);
                 Triangle[] vert_1_adjacentTriList = edgeGraph.getAdjacentTriangleArray(vertices[vert_1]);
@@ -372,7 +282,8 @@ namespace ThreeDModelProcessing
                 Triangle adjacentTriangle1 = FindSameTriangleInGivenArrays(vert_0_adjacentTriList, vert_1_adjacentTriList, currTriangle);
                 if (adjacentTriangle1 != null)
                 {
-                    Vector3 adjacentEdgeNormal = GetTriangleNormal(
+                    Vector3 adjacentEdgeNormal = MeshUtility.GetTriangleNormal(
+                        mesh,
                         new Vector3[]{
                             adjacentTriangle1.vertex1,
                             adjacentTriangle1.vertex2,
@@ -393,7 +304,8 @@ namespace ThreeDModelProcessing
                 Triangle adjacentTriangle2 = FindSameTriangleInGivenArrays(vert_0_adjacentTriList, vert_2_adjacentTriList, currTriangle);
                 if (adjacentTriangle2 != null)
                 {
-                    Vector3 adjacentEdgeNormal = GetTriangleNormal(
+                    Vector3 adjacentEdgeNormal = MeshUtility.GetTriangleNormal(
+                        mesh,
                         new Vector3[]{
                             adjacentTriangle2.vertex1,
                             adjacentTriangle2.vertex2,
@@ -415,7 +327,8 @@ namespace ThreeDModelProcessing
                 Triangle adjacentTriangle3 = FindSameTriangleInGivenArrays(vert_1_adjacentTriList, vert_2_adjacentTriList, currTriangle);
                 if (adjacentTriangle3 != null)
                 {
-                    Vector3 adjacentEdgeNormal = GetTriangleNormal(
+                    Vector3 adjacentEdgeNormal = MeshUtility.GetTriangleNormal(
+                        mesh,
                         new Vector3[]{
                             adjacentTriangle3.vertex1,
                             adjacentTriangle3.vertex2,
@@ -454,7 +367,8 @@ namespace ThreeDModelProcessing
             {
                 fileName = transform.parent.gameObject.name + extension;
             }
-            edgeCollection.SaveFile(path + "/" + fileName + extension);
+            edgeData.wholeFilePah = path + "/" + fileName + extension;
+            edgeCollection.SaveFile(edgeData.wholeFilePah);
             systemTimer.Stop();
 
             print("vertices count : " + mesh.vertexCount + " triangle count : " + mesh.triangles.Length);
@@ -464,32 +378,6 @@ namespace ThreeDModelProcessing
 
         }
 
-        static int FindSameNumberInGivenArrays(int[] arr1, int[] arr2)
-        {
-            if (arr1.Length <= arr2.Length)
-            {
-                var hashSet = new HashSet<int>(arr1);
-                for (int i = 0; i < arr1.Length; i++)
-                {
-                    if (hashSet.Contains(arr2[i]))
-                        return arr2[i];
-                }
-            }
-            else
-            {
-                var hashSet = new HashSet<int>(arr2);
-                for (int i = 0; i < arr2.Length; i++)
-                {
-                    if (hashSet.Contains(arr1[i]))
-                        return arr1[i];
-                }
-            }
-
-
-            //if can't find same number in given arrays , return -1 
-            //(Beacause there won't be a negetive number in triangle index)
-            return -1;
-        }
 
         static Triangle FindSameTriangleInGivenArrays(Triangle[] triArr1, Triangle[] triArr2, Triangle exclude)
         {
@@ -523,23 +411,36 @@ namespace ThreeDModelProcessing
 
         }
 
+        
+
         void DrawEdge(EdgeRawData edgeList)
         {
+            GL.PushMatrix();
             foreach (var edge in edgeList.edges)
             {
-                Vector3 head = edgeList.vertices[edge.x];
-                Vector3 tail = edgeList.vertices[edge.y];
+                Vector3 head = transform.TransformPoint(edgeList.vertices[edge.x]);
+                Vector3 tail = transform.TransformPoint(edgeList.vertices[edge.y]);
+                GL.Begin(GL.LINES);
+                GL.Vertex3(head.x, head.y, head.z);
+                GL.Vertex3(tail.x, tail.y, tail.z);
+                GL.End();
+            }
+            GL.PopMatrix();
+        }
+        void OnDrawGizmos()
+        {
+            Gizmos.color = color;
+            if (Time.time == 0 || !isDrawGizmos) return;
+            foreach (var edge in edgeCollection.edges)
+            {
+                Vector3 head = edgeCollection.vertices[edge.x];
+                Vector3 tail = edgeCollection.vertices[edge.y];
 
                 Gizmos.DrawLine(transform.TransformPoint(head), transform.TransformPoint(tail));
 
                 Gizmos.DrawSphere(transform.TransformPoint(head), scale);
                 Gizmos.DrawSphere(transform.TransformPoint(tail), scale);
             }
-        }
-        void OnDrawGizmos()
-        {
-            Gizmos.color = color;
-            DrawEdge(edgeCollection);
         }
 
         void OnGUI()

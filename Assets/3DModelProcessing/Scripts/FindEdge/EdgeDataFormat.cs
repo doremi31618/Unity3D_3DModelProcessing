@@ -5,7 +5,7 @@ using System;
 using System.IO;
 using System.Linq;
 // using System.Text;
-namespace ThreeDModelProcessing
+namespace ThreeDModelProcessing.Edge
 {
     public class Triangle
     {
@@ -429,24 +429,4 @@ namespace ThreeDModelProcessing
         }
     }
 
-
-    [Serializable]
-    public class SimplifyModelData
-    {
-        public EdgeGraph edgeGraph;
-        // public EdgeRawData rawData;
-
-        public SimplifyModelData(EdgeRawData _rawData)
-        {
-            // rawData = _rawData;
-            edgeGraph = new EdgeGraph(_rawData.getVertexNumber, false);
-        }
-
-
-        public void AddEdge(int u, int v)
-        {
-            edgeGraph.addEdge(u, v);
-        }
-
-    }
 }

@@ -44,6 +44,7 @@
      <Compile Include="Assets\OxOD\Demo\TextSaver.cs" />
      <Compile Include="Assets\OxOD\Scripts\DoubleclickUI.cs" />
      <Compile Include="Assets\3DModelProcessing\Scripts\Center\CenterModel.cs" />
+     <Compile Include="Assets\3DModelProcessing\Scripts\FindEdge\EdgeSelector.cs" />
      <Compile Include="Assets\3DModelProcessing\Scripts\Experiment\SetRenderMode.cs" />
      <Compile Include="Assets\3DModelProcessing\Scripts\Experiment\FindClosestPointOfVertex.cs" />
      <Compile Include="Assets\OxOD\Demo\FolderPathDisplayer.cs" />
@@ -63,7 +64,10 @@
      <Compile Include="Assets\3DModelProcessing\Scripts\MeshSimplify\ProcessMeshSimplify.cs" />
      <Compile Include="Assets\3DModelProcessing\Scripts\Experiment\SnapFace.cs" />
      <Compile Include="Assets\OxOD\Scripts\FileDialog.cs" />
-     <Compile Include="Assets\3DModelProcessing\Scripts\FindEdge\EdgeSelector.cs" />
+     <Compile Include="Assets\3DModelProcessing\Scripts\FindEdge\EdgeData.cs" />
+     <Compile Include="Assets\3DModelProcessing\Scripts\Utility\MeshUtility.cs" />
+     <Compile Include="Assets\3DModelProcessing\Scripts\Utility\AlgorithmUtility.cs" />
+     <Compile Include="Assets\3DModelProcessing\Scripts\FindEdge\EdgeDataGizmos.cs" />
      <None Include="Assets\3DModelProcessing\Shader\NormalDebug.shader" />
      <None Include="Assets\OxOD\Font\LICENCE.txt" />
      <None Include="Assets\3DModelProcessing\Shader\VertexColor.shader" />

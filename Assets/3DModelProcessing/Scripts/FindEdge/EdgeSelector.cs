@@ -3,103 +3,118 @@ using System.Collections.Generic;
 using UnityEngine;
 using ThreeDModelProcessing;
 
-public class EdgeSelector : MonoBehaviour
+namespace ThreeDModelProcessing.Edge
 {
-    public bool isUseSelect = true;
-    public Vector3 point;
-    public Color gizmosColor = Color.white;
-    [Range(0.001f, 0.01f)] public float scale = 0.005f;
-    EdgeRawData edgeCollection;
-
-    void GetClosestEdge()
+    public class EdgeSelector : MonoBehaviour
     {
+        
+        public bool isSelected = true;
+        int clickCount = 0;
+        public Vector3[] selectedEdgeVertices;
+        public Color gizmosColor = Color.white;
+        [Range(0.001f, 0.01f)] public float scale = 0.005f;
+        EdgeRawData edgeCollection;
 
-        RaycastHit hit;
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-
-        if (Physics.Raycast(ray, out hit))
+        Vector3 GetClosestEdge()
         {
-            // point = hit.point;
-            Debug.DrawLine(transform.position, hit.point, Color.red, 1f);
-            print("hit point (world space) : " +hit.point);
-            if (hit.transform.GetComponent<EdgeFinder>().edgeCollection != null)
-            {
-                edgeCollection = hit.transform.GetComponent<EdgeFinder>().edgeCollection;
-                if (edgeCollection == null) return;
-                Vector3 objectSpacePoint =  hit.transform.InverseTransformPoint(hit.point);//
-                print("hit point (local space) : " +objectSpacePoint);
-                // Transform hitTransform = hit.transform.parent;
-                // while(hitTransform != null){
-                //     objectSpacePoint = hitTransform.worldToLocalMatrix * objectSpacePoint;
-                //     if (hitTransform.parent == null)break;
-                //     hitTransform = hitTransform.parent;
-                // }
 
-                point = hit.transform.TransformPoint( edgeCollection.getClosestVertex(objectSpacePoint));//edgeCollection.getClosestVertex(
-                    print("hit point (transform world space) : " +point);
-                // hitTransform = hit.transform.parent;
-                // while(hitTransform != null){
-                //     point = hitTransform.localToWorldMatrix *point;
-                //     if (hitTransform.parent == null)break;
-                //     hitTransform = hitTransform.parent;
-                // }
-                // point = hit.transform.TransformPoint(edgeGraph.GetClosestVertex(objectSpacePoint));
+            RaycastHit hit;
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            Vector3 cloesestPoint = Vector3.zero;
+            if (Physics.Raycast(ray, out hit))
+            {
+                // point = hit.point;
+                Debug.DrawLine(transform.position, hit.point, Color.red, 1f);
+                // print("hit point (world space) : " +hit.point);
+                if (hit.transform.GetComponent<EdgeFinder>().edgeCollection != null)
+                {
+                    edgeCollection = hit.transform.GetComponent<EdgeFinder>().edgeCollection;
+                    if (edgeCollection == null) return cloesestPoint;
+                    Vector3 objectSpacePoint = hit.transform.InverseTransformPoint(hit.point);
+                    cloesestPoint = GetClosestVertex(hit.point);
+                }
+                else
+                {
+                    print("Haven't build edge data");
+                }
+            }
+
+            return cloesestPoint;
+
+        }
+
+        List<Vector3> GetShortestPath(Vector3 head, Vector3 tail){
+            List<Vector3> path = new List<Vector3>();
+            
+            return path;
+        }
+
+        Vector3 GetClosestVertex(Vector3 hitPoint)
+        {
+            Vector3 objectSpacePoint = transform.InverseTransformPoint(hitPoint);
+            Vector3 cloesestPoint = edgeCollection.getClosestVertex(objectSpacePoint);
+            // var adjacentList = hit.transform.GetComponent<EdgeFinder>().getEdgeGraph.getAdjacentVertexArray(cloesestPoint);
+            // foreach(var adjPoint in adjacentList){
+            //     print("adj : " + adjPoint);
+            // }
+            return transform.TransformPoint(cloesestPoint);
+        }
+
+        
+
+        void SelectVertex()
+        {
+            RaycastHit hit;
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            Vector3 closestPoint = Vector3.zero;
+            if (Physics.Raycast(ray, out hit))
+            {
+                // point = hit.point;
+                Debug.DrawLine(transform.position, hit.point, Color.red, 1f);
+                // print("hit point (world space) : " +hit.point);
+                if (hit.transform.GetComponent<EdgeFinder>().edgeCollection != null)
+                {
+                    edgeCollection = hit.transform.GetComponent<EdgeFinder>().edgeCollection;
+                    if (edgeCollection == null) return;
+                    Vector3 objectSpacePoint = hit.transform.InverseTransformPoint(hit.point);
+                    closestPoint = GetClosestVertex(hit.point);
+                }
+                else
+                {
+                    print("Haven't build edge data");
+                }
+            }
+
+            if (closestPoint == Vector3.zero)return;
+
+            clickCount %= 2;
+            if (clickCount == 0){
+                selectedEdgeVertices = new Vector3[2];
+            }
+            selectedEdgeVertices[clickCount++] = closestPoint;
+        }
+
+
+        void OnMouseDown()
+        {
+            if (isSelected)
+            {
+                SelectVertex();
             }
         }
 
-
-
-
-
-
-    }
-
-    void Update()
-    {
-        if (Input.GetMouseButtonDown(0) && isUseSelect)
+        void OnDrawGizmos()
         {
-            GetClosestEdge();
+            if (Time.time == 0 && selectedEdgeVertices.Length == 2)return;
+            Gizmos.color = gizmosColor;
+            foreach(var point in selectedEdgeVertices){
+                if (point != Vector3.zero)
+                {
+                    Gizmos.DrawSphere(point, scale);
+                }
+            }
+            
         }
     }
 
-    // void OnMouseDown()
-    // {
-    //     // print("MouseDown");
-    //     Vector3[] vertices = GetComponent<MeshFilter>().mesh.vertices;
-    //     Vector3 mouseClickPosition = mousePoint();
-    //     // GetClosestEdge();
-
-    //     float distance = Mathf.Infinity;
-    //     foreach (var vertex in vertices)
-    //     {
-    //         float _distance = Vector3.Distance(mouseClickPosition, transform.TransformPoint(vertex));
-    //         if (_distance < distance)
-    //         {
-    //             point = transform.TransformPoint(vertex);
-    //             distance = _distance;
-    //         }
-    //     }
-    // }
-
-    Vector3 mousePoint()
-    {
-        RaycastHit hit;
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-
-        if (Physics.Raycast(ray, out hit))
-        {
-            point = hit.point;
-        }
-
-        return point;
-    }
-
-    void OnDrawGizmos()
-    {
-        Gizmos.color = gizmosColor;
-        if (point != Vector3.zero)
-        {
-            Gizmos.DrawSphere(point, scale);
-        }
-    }
 }
