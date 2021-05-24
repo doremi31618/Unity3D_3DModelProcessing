@@ -29,17 +29,17 @@ namespace ThreeDModelProcessing
         public string extension = ".txt";
         public string fileName = "edgeData";
         public string graphName = "edgeGraph";
-        public int[] _triangle;
-        public Vector3[] vertices;
+        int[] _triangle;
+        Vector3[] vertices;
 
 
         //attributes
         MeshFilter meshFilter;
         Mesh mesh;
         // List<Edge> edgeList = new List<Edge>();
-        EdgeRawData edgeCollection = new EdgeRawData();
+        public EdgeRawData edgeCollection = new EdgeRawData();
         EdgeGraph edgeGraph;
-        public EdgeGraph getEdgeGraph{get{return edgeGraph;}}
+        public EdgeGraph getEdgeGraph { get { return edgeGraph; } }
 
         float percentage = 0;
 
@@ -94,8 +94,8 @@ namespace ThreeDModelProcessing
             // print(vertices[0]*10000);
             // print(vertices[1]*10000);
             // print(vertices[2]*10000);
-            Vector3 vert1 = vertices[1]*10000 - vertices[0]*10000 ;
-            Vector3 vert2 = vertices[2]*10000  - vertices[0]*10000 ;
+            Vector3 vert1 = vertices[1] * 10000 - vertices[0] * 10000;
+            Vector3 vert2 = vertices[2] * 10000 - vertices[0] * 10000;
             // print("============substract===========");
             // print(vert1);
             // print(vert2);
@@ -155,7 +155,8 @@ namespace ThreeDModelProcessing
             print(String.Join(",", mesh.triangles));
         }
         #region method 2
-        IEnumerator method_2_optimize_coroutine(){
+        IEnumerator method_2_optimize_coroutine()
+        {
             Stopwatch systemTimer = new Stopwatch();
             float nextTime = 500;
             systemTimer.Start();
@@ -184,7 +185,17 @@ namespace ThreeDModelProcessing
                 edgeGraph.addTriangle(vertices[triangles[triangleIndex]], newTriangle);
                 edgeGraph.addTriangle(vertices[triangles[triangleIndex + 1]], newTriangle);
                 edgeGraph.addTriangle(vertices[triangles[triangleIndex + 2]], newTriangle);
- 
+
+                edgeGraph.addEdge(
+                    vertices[triangles[triangleIndex]],
+                    vertices[triangles[triangleIndex + 1]]);
+                edgeGraph.addEdge(
+                    vertices[triangles[triangleIndex]],
+                    vertices[triangles[triangleIndex + 2]]);
+                edgeGraph.addEdge(
+                    vertices[triangles[triangleIndex + 1]],
+                    vertices[triangles[triangleIndex + 2]]);
+
                 if (systemTimer.ElapsedMilliseconds > nextTime)
                 {
                     nextTime = systemTimer.ElapsedMilliseconds + 500;
@@ -200,8 +211,9 @@ namespace ThreeDModelProcessing
             edgeCollection.Clear();
 
             //Build normal graph 
-            for(int i=0; i< vertexCount; i++){
-                percentage = ((float)i / (float)vertexCount)/4 + 0.5f;
+            for (int i = 0; i < vertexCount; i++)
+            {
+                percentage = ((float)i / (float)vertexCount) / 4 + 0.5f;
                 //Get Vertex
                 Vector3 vertex = vertices[i];
                 Vector3 averageNormal = edgeGraph.caculateVertexAverageNoraml(vertex);
@@ -214,21 +226,23 @@ namespace ThreeDModelProcessing
                 }
             }
 
-            for(int i=0; i< vertexCount; i++){
-                percentage = ((float)i / (float)vertexCount)/4 + 0.75f;
+            for (int i = 0; i < vertexCount; i++)
+            {
+                percentage = ((float)i / (float)vertexCount) / 4 + 0.75f;
                 Vector3 vertex = vertices[i];
                 Vector3 averageNormal = Vector3.zero;
                 List<Triangle> adjacentTriangle = edgeGraph.getAdjacentTriangleList(vertex);
                 Vector3 normal = edgeGraph.getVertexAverageNormal(vertex);
-                
+
                 //check each adjacent triangle of vertex
-                foreach(var triangle in adjacentTriangle)
+                foreach (var triangle in adjacentTriangle)
                 {
                     //find common edge 
                     Vector3[] commonEdge = triangle.edgeExcludeVertex(vertex);
                     Triangle adjacentCell = null;
                     //find adjacent triangle 
-                    if (commonEdge != null){
+                    if (commonEdge != null)
+                    {
                         Triangle[] vert0_adjacentTriangleList = edgeGraph.getAdjacentTriangleArray(commonEdge[0]);
                         Triangle[] vert1_adjacentTriangleList = edgeGraph.getAdjacentTriangleArray(commonEdge[1]);
                         adjacentCell = FindSameTriangleInGivenArrays(
@@ -236,14 +250,18 @@ namespace ThreeDModelProcessing
                             vert1_adjacentTriangleList,
                             triangle
                         );
-                    }else{
+                    }
+                    else
+                    {
                         print("vertex not in the edge");
                         continue;
                     }
 
                     //compare 2 normal (if so add edge to list)
+                    if (adjacentCell == null) continue;
                     float dotProduct = Vector3.Dot(adjacentCell.normal.normalized, normal.normalized);
-                    if (dotProduct < Mathf.Cos(angle * Mathf.Deg2Rad)){
+                    if (dotProduct < Mathf.Cos(angle * Mathf.Deg2Rad))
+                    {
                         edgeCollection.AddEdge(commonEdge[0], commonEdge[1]);
                     }
                 }
@@ -254,10 +272,10 @@ namespace ThreeDModelProcessing
                     yield return new WaitForEndOfFrame();
                 }
             }
-
+            edgeCollection.SaveFile(path + "/" + fileName + extension);
             edgeGraph = EdgeGraph.ConvertEdgeRawDataToGraph(edgeCollection, true);
         }
-         
+
         #endregion //method 2 end
         IEnumerator method_1_optimize_coroutine()
         {
@@ -289,7 +307,17 @@ namespace ThreeDModelProcessing
                 edgeGraph.addTriangle(vertices[triangles[triangleIndex]], newTriangle);
                 edgeGraph.addTriangle(vertices[triangles[triangleIndex + 1]], newTriangle);
                 edgeGraph.addTriangle(vertices[triangles[triangleIndex + 2]], newTriangle);
- 
+
+                edgeGraph.addEdge(
+                    vertices[triangles[triangleIndex]],
+                    vertices[triangles[triangleIndex + 1]]);
+                edgeGraph.addEdge(
+                    vertices[triangles[triangleIndex]],
+                    vertices[triangles[triangleIndex + 2]]);
+                edgeGraph.addEdge(
+                    vertices[triangles[triangleIndex + 1]],
+                    vertices[triangles[triangleIndex + 2]]);
+
                 if (systemTimer.ElapsedMilliseconds > nextTime)
                 {
                     nextTime = systemTimer.ElapsedMilliseconds + 500;
@@ -298,8 +326,9 @@ namespace ThreeDModelProcessing
             }
 
             //Build normal graph 
-            for(int i=0; i< vertexCount; i++){
-                percentage = ((float)i / (float)vertexCount)/4 + 0.5f;
+            for (int i = 0; i < vertexCount; i++)
+            {
+                percentage = ((float)i / (float)vertexCount) / 4 + 0.5f;
                 //Get Vertex
                 Vector3 vertex = vertices[i];
                 Vector3 averageNormal = edgeGraph.caculateVertexAverageNoraml(vertex);
@@ -341,7 +370,8 @@ namespace ThreeDModelProcessing
 
                 //Edge 0 - 1
                 Triangle adjacentTriangle1 = FindSameTriangleInGivenArrays(vert_0_adjacentTriList, vert_1_adjacentTriList, currTriangle);
-                if ( adjacentTriangle1 != null){
+                if (adjacentTriangle1 != null)
+                {
                     Vector3 adjacentEdgeNormal = GetTriangleNormal(
                         new Vector3[]{
                             adjacentTriangle1.vertex1,
@@ -354,14 +384,15 @@ namespace ThreeDModelProcessing
                     bool isEdge = dot_result <= Mathf.Cos(angle * Mathf.Deg2Rad);
                     if (isEdge)
                     {
-                        print (dot_result +　" cos : " + Mathf.Cos(angle * Mathf.PI / 180));
+                        // print (dot_result +　" cos : " + Mathf.Cos(angle * Mathf.PI / 180));
                         edgeCollection.AddEdge(currTriangle.vertex1, currTriangle.vertex2);
                     }
                 }
 
                 //Edge 0 - 2
                 Triangle adjacentTriangle2 = FindSameTriangleInGivenArrays(vert_0_adjacentTriList, vert_2_adjacentTriList, currTriangle);
-                if ( adjacentTriangle2 != null){
+                if (adjacentTriangle2 != null)
+                {
                     Vector3 adjacentEdgeNormal = GetTriangleNormal(
                         new Vector3[]{
                             adjacentTriangle2.vertex1,
@@ -382,7 +413,8 @@ namespace ThreeDModelProcessing
 
                 //Edge 1 - 2
                 Triangle adjacentTriangle3 = FindSameTriangleInGivenArrays(vert_1_adjacentTriList, vert_2_adjacentTriList, currTriangle);
-                if ( adjacentTriangle3 != null){
+                if (adjacentTriangle3 != null)
+                {
                     Vector3 adjacentEdgeNormal = GetTriangleNormal(
                         new Vector3[]{
                             adjacentTriangle3.vertex1,
@@ -407,7 +439,8 @@ namespace ThreeDModelProcessing
                 }
             }
             List<Vector3> _normals = new List<Vector3>();
-            foreach (var edgeVertex in edgeCollection.vertices){
+            foreach (var edgeVertex in edgeCollection.vertices)
+            {
                 _normals.Add(edgeGraph.getVertexAverageNormal(edgeVertex));
                 if (systemTimer.ElapsedMilliseconds > nextTime)
                 {
@@ -417,10 +450,11 @@ namespace ThreeDModelProcessing
             }
             edgeCollection.AddNormal(_normals);
 
-            if (fileName == ""){
+            if (fileName == "")
+            {
                 fileName = transform.parent.gameObject.name + extension;
             }
-            edgeCollection.SaveFile(path + "/" + fileName);
+            edgeCollection.SaveFile(path + "/" + fileName + extension);
             systemTimer.Stop();
 
             print("vertices count : " + mesh.vertexCount + " triangle count : " + mesh.triangles.Length);
@@ -457,7 +491,8 @@ namespace ThreeDModelProcessing
             return -1;
         }
 
-        static Triangle FindSameTriangleInGivenArrays(Triangle[] triArr1, Triangle[] triArr2, Triangle exclude){
+        static Triangle FindSameTriangleInGivenArrays(Triangle[] triArr1, Triangle[] triArr2, Triangle exclude)
+        {
             var hashSet = new HashSet<Triangle>(triArr1);
             if (triArr1.Length <= triArr2.Length)
             {
@@ -509,7 +544,7 @@ namespace ThreeDModelProcessing
 
         void OnGUI()
         {
-            if (!isUseGUI)return;
+            if (!isUseGUI) return;
             Rect btn = new Rect(50, 50, 150, 50);
             if (GUI.Button(btn, "method 1"))
             {
@@ -522,7 +557,7 @@ namespace ThreeDModelProcessing
             if (GUI.Button(btn2, "method 2 "))
             {
                 // method_1();
-                 StartCoroutine(method_2_optimize_coroutine());
+                StartCoroutine(method_2_optimize_coroutine());
             }
 
             GUI.Label(new Rect(50, 100, 150, 50), "Loading : " + percentage * 100 + "%");

@@ -19,12 +19,11 @@ public class MoveCamera : MonoBehaviour
     private bool MiddleMouseButtonDown = false;
     private bool MouseWheelScroll = false;
 
-    public GameObject FileDialog;
 
     // Start is called before the first frame update
     void Start()
     {
-        transform.LookAt(TrackingPointTransform);
+        // transform.LookAt(TrackingPointTransform);
     }
 
     // Update is called once per frame
@@ -63,15 +62,15 @@ public class MoveCamera : MonoBehaviour
             //Debug.Log(axis.ToString());
             //Debug.Log(transform.localEulerAngles.x);
 
-            if (transform.localEulerAngles.x>270 || transform.localEulerAngles.x < 86 || Input.GetAxis("Mouse Y") > 0)            
+            if (transform.localEulerAngles.x > 270 || transform.localEulerAngles.x < 86 || Input.GetAxis("Mouse Y") > 0)
             //if ((transform.localRotation.x > 89 & Input.GetAxis("Mouse Y") < 0) || transform.localRotation.x < 89)
             {
 
-                Quaternion camVTurnAngle = Quaternion.AngleAxis(Input.GetAxis("Mouse Y") * VerticalSpeed *-1, transform.right);
+                Quaternion camVTurnAngle = Quaternion.AngleAxis(Input.GetAxis("Mouse Y") * VerticalSpeed * -1, transform.right);
                 //Debug.Log(camVTurnAngle.eulerAngles.x);
                 //Debug.Log(camVTurnAngle.eulerAngles.y);
                 //Debug.Log(camVTurnAngle.eulerAngles.z);
-                
+
                 _cameraOffset = camTurnAngle * camVTurnAngle * _cameraOffset;
             }
             else
@@ -116,9 +115,9 @@ public class MoveCamera : MonoBehaviour
                 //Debug.DrawRay(transform.position, transform.TransformDirection(Vector3.forward) * 1000, Color.white);
                 //Debug.Log("Did not Hit");
             }
-            
+
         }
-if ( Application.isFocused)
+        if (Application.isFocused)
         {
             transform.position += Vector3.MoveTowards(Vector3.zero, transform.forward, Input.GetAxis("Mouse ScrollWheel") * ZoomSpeed);
         }

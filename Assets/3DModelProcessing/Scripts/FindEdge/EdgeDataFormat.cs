@@ -63,6 +63,25 @@ namespace ThreeDModelProcessing
             nodeNumber = number;
         }
 
+        /// <summary>
+        /// the point must be in the object space
+        /// </summary>
+        /// <param name="point"></param>
+        /// <returns></returns>
+        public Vector3 GetClosestVertex(Vector3 point){
+            float minDist = Mathf.Infinity;
+            Vector3 closestPoint = Vector3.one; 
+            foreach(var item in vertexGraph){
+                float dist = Vector3.Distance(point, item.Key);
+                if ( dist < minDist) {
+                    minDist = dist;
+                    closestPoint = item.Key;    
+                }
+            }
+
+            return closestPoint;
+        }
+
         public void InitEdgeGraph(int number)
         {
 
@@ -114,7 +133,6 @@ namespace ThreeDModelProcessing
                     vertexGraph[adjacentPoint].Add(vertex);
                 }
             }
-
         }
         public void addTriangle(Vector3 vertex, Triangle triangle)
         {
@@ -231,6 +249,7 @@ namespace ThreeDModelProcessing
         public static EdgeGraph ConvertEdgeRawDataToGraph(EdgeRawData rawData)
         {
             int nodeNum = rawData.getVertexNumber;
+
             EdgeGraph newGraph = new EdgeGraph(nodeNum, true);
             newGraph.InitEdgeGraphDict(nodeNum);
             for (int i = 0; i < rawData.getEdgeNumber; i++)
@@ -251,12 +270,10 @@ namespace ThreeDModelProcessing
 
         public static EdgeGraph ConvertEdgeRawDataToGraph(EdgeRawData rawData, bool isSaveNormal)
         {
-            if (!isSaveNormal || (rawData.normals == null))
+            if (!isSaveNormal || (rawData.normals == null) || rawData.normals.Count == 0)
             {
                 return ConvertEdgeRawDataToGraph(rawData);
             }
-            else if (rawData.normals.Count == 0)
-                return ConvertEdgeRawDataToGraph(rawData);
 
             int nodeNum = rawData.getVertexNumber;
             EdgeGraph newGraph = new EdgeGraph(nodeNum, true);
@@ -264,19 +281,37 @@ namespace ThreeDModelProcessing
             for (int i = 0; i < rawData.getEdgeNumber; i++)
             {
                 //get edge data 
+                if (i < 0 || i >= rawData.edges.Count)
+                {
+                    Debug.Log("index out of bound : " + i);
+                }
                 Vector2Int edgeIndex = rawData.getEdge(i);
 
                 //get edge vertex   
                 Vector3 edgeVertex1 = rawData.getVertex(edgeIndex.x);
                 Vector3 edgeVertex2 = rawData.getVertex(edgeIndex.y);
 
-                Vector3 vertexNormal1 = rawData.normals[edgeIndex.x];
-                Vector3 vertexNormal2 = rawData.normals[edgeIndex.y];
+                if (edgeIndex.x >= rawData.normals.Count || edgeIndex.x <0)
+                {
+                    Debug.Log("normal index out of bound : " + edgeIndex.x);
+                }
+                else if (edgeIndex.y >= rawData.normals.Count || edgeIndex.y <0)
+                {
+                    Debug.Log("normal index out of bound : " + edgeIndex.y);
+                }
+                else
+                {
+                    Vector3 vertexNormal1 = rawData.normals[edgeIndex.x];
+                    Vector3 vertexNormal2 = rawData.normals[edgeIndex.y];
+
+                    newGraph.addNormal(edgeVertex1, vertexNormal1);
+                    newGraph.addNormal(edgeVertex2, vertexNormal2);
+                }
+
 
                 //save to graph
                 newGraph.addEdge(edgeVertex1, edgeVertex2);
-                newGraph.addNormal(edgeVertex1, vertexNormal1);
-                newGraph.addNormal(edgeVertex2, vertexNormal2);
+
 
             }
             return newGraph;
@@ -305,12 +340,25 @@ namespace ThreeDModelProcessing
         {
             vertices.Clear();
             edges.Clear();
+            normals.Clear();
         }
         public Vector2Int getEdge(int index)
         {
             return edges[index];
         }
+        public Vector3 getClosestVertex(Vector3 point){
+            float minDist = Mathf.Infinity;
+            Vector3 closestPoint = Vector3.one; 
+            foreach(var item in vertices){
+                float dist = Vector3.Distance(point, item);
+                if ( dist < minDist) {
+                    minDist = dist;
+                    closestPoint = item;    
+                }
+            }
 
+            return closestPoint;
+        }
         public Vector3 getVertex(int index)
         {
             return vertices[index];

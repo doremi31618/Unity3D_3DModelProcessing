@@ -9,11 +9,12 @@ public class EdgeReader : MonoBehaviour
 {
     public string extension = ".txt";
     public string fileName = "edgeData.txt";
-    public string graphFileName = "edgeGraph.txt";
+    public string graphName = "edgeGraph.txt";
     public string readFrom = "";
     // public List<Edge> edgeList = new List<Edge>();
     [HideInInspector]public EdgeRawData edgeList;
     [HideInInspector]public EdgeGraph edgeGraph;
+    public bool isUseGUI = false;
     public bool isShowGizmos = true;
     public bool isDrawNormals = false;
     [Range(0.001f, 0.01f)] public float scale = 0.01f;
@@ -22,6 +23,14 @@ public class EdgeReader : MonoBehaviour
     void ReadEdge(string path)
     {
         string wholePath = "";
+        if (GetComponent<EdgeFinder>() != null){
+            fileName = GetComponent<EdgeFinder>().fileName;
+            graphName = GetComponent<EdgeFinder>().graphName;
+            extension = GetComponent<EdgeFinder>().extension;
+            readFrom = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+            path = "Exist";
+        }
+
         if (path == "")
         {
             readFrom = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
@@ -30,6 +39,8 @@ public class EdgeReader : MonoBehaviour
         else{
             wholePath = readFrom + "/" + fileName + extension;
         }
+
+        
         edgeList = EdgeRawData.ReadFile(wholePath);
 
         // while (sr.Peek() >= 0)
@@ -44,7 +55,7 @@ public class EdgeReader : MonoBehaviour
     {
         if (path == "")
         {
-            path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "/" + graphFileName + extension;
+            path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "/" + graphName + extension;
         }
         edgeGraph = EdgeGraph.ConvertEdgeRawDataToGraph(edgeList, true);
         edgeGraph.OutputDictGraph(path);
@@ -53,6 +64,7 @@ public class EdgeReader : MonoBehaviour
 
     void OnGUI()
     {
+        if (!isUseGUI)return;
         Rect btn = new Rect(50, 150, 150, 50);
         if (GUI.Button(btn, "Read Edge"))
         {
