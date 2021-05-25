@@ -65,6 +65,7 @@ namespace ThreeDModelProcessing.Edge
 
 
             edgeCollection = EdgeRawData.ReadFile(wholePath);
+            edgeCollection.BuildEdgeGraphBasedOnRawData();
 
         }
 

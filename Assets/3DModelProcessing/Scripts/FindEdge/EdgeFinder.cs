@@ -372,7 +372,7 @@ namespace ThreeDModelProcessing.Edge
             systemTimer.Stop();
 
             print("vertices count : " + mesh.vertexCount + " triangle count : " + mesh.triangles.Length);
-            print(systemTimer.Elapsed.Minutes + ", " + systemTimer.Elapsed.Seconds + ", " + systemTimer.Elapsed.Milliseconds);
+            //print(systemTimer.Elapsed.Minutes + ", " + systemTimer.Elapsed.Seconds + ", " + systemTimer.Elapsed.Milliseconds);
 
             yield return new WaitForEndOfFrame();
 

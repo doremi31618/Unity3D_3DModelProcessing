@@ -329,12 +329,14 @@ namespace ThreeDModelProcessing.Edge
         public int getEdgeNumber { get { return edges.Count; } }
         // public List<Vector3> getNormals {get {return normals;}}
         public List<Vector3> normals;
+        public EdgeGraph edgeGraph;
 
         public EdgeRawData()
         {
 
             vertices = new List<Vector3>();
             edges = new List<Vector2Int>();
+            edgeGraph = EdgeGraph.ConvertEdgeRawDataToGraph(this);
         }
         public void Clear()
         {
@@ -346,7 +348,7 @@ namespace ThreeDModelProcessing.Edge
         {
             return edges[index];
         }
-        public Vector3 getClosestVertex(Vector3 point){
+        public Vector3 GetClosestVertex(Vector3 point){
             float minDist = Mathf.Infinity;
             Vector3 closestPoint = Vector3.one; 
             foreach(var item in vertices){
@@ -416,8 +418,11 @@ namespace ThreeDModelProcessing.Edge
             string edgeJSON = JsonUtility.ToJson(this);
             sw.Write(edgeJSON);
             sw.Close();
-
+            BuildEdgeGraphBasedOnRawData();
             Debug.Log("save edge raw data to " + path);
+        }
+        public void BuildEdgeGraphBasedOnRawData(){
+            edgeGraph = EdgeGraph.ConvertEdgeRawDataToGraph(this);
         }
 
         public static EdgeRawData ReadFile(string path)
