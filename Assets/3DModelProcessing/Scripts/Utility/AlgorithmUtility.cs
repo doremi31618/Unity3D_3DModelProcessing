@@ -190,9 +190,9 @@ namespace ThreeDModelProcessing.Algorithm
         public List<Vector3> getShortestPath { get { return finalPath; } }
         public AStartSearch(Vector3 startPoint, Vector3 destination, EdgeGraph graph)
         {
-            Debug.Log("Start AStar Algorithm");
-            Debug.Log("start from" + startPoint);
-            Debug.Log("destination" + destination);
+            // Debug.Log("Start AStar Algorithm");
+            // Debug.Log("start from" + startPoint);
+            // Debug.Log("destination" + destination);
             Node firstNode = new Node();
             finalPath = new List<Vector3>();
             allNode = new Dictionary<Vector3, Node>();
@@ -214,11 +214,11 @@ namespace ThreeDModelProcessing.Algorithm
                 var nextItem = openList.Dequeue();
                 closedList.Add(nextItem.Key);
                 Node nextNode = allNode[nextItem.Key];
-                Debug.Log("Dequeue node [key] : " + nextItem.Key + " [Value] :" + nextItem.Value);
+                // Debug.Log("Dequeue node [key] : " + nextItem.Key + " [Value] :" + nextItem.Value);
                 // Debug.Log("next node [vertex] : " + nextNode.position + " [Value] : " + nextNode.estimateCost);
                 if (nextNode.position == destination)
                 {
-                    Debug.Log("Find destination : " + destination);
+                    // Debug.Log("Find destination : " + destination);
                     //find all path and update final Path
                     while (nextNode.parent_node != null)
                     {
@@ -240,25 +240,25 @@ namespace ThreeDModelProcessing.Algorithm
                         //chcek if node were already in open list -> skip
                         if (allNode.ContainsKey(vertex))
                         {
-                            Debug.Log("already in allNodes");
+                            // Debug.Log("already in allNodes");
                             continue;
                         }
 
                         //check if they were in closed list -> skip
                         if (closedList.Contains(vertex))
                         {
-                            Debug.Log("already in ClosedList");
+                            // Debug.Log("already in ClosedList");
                             continue;
                         }
 
                         //if not -> create new node 
                         Node newNode = new Node();
-                        Debug.Log("add vertex to node: " + vertex);
+                        // Debug.Log("add vertex to node: " + vertex);
                         newNode.position = vertex;
                         newNode.parent_node = nextNode;
                         newNode.currentCost = nextNode.currentCost + PathCostEstimate(nextNode.position, vertex);
                         newNode.estimateCost = PathCostEstimate(vertex, destination);
-                        Debug.Log(newNode);
+                        // Debug.Log(newNode);
                         allNode.Add(vertex, newNode);
                         openList.Add(vertex, newNode.estimateCost);
                     }
@@ -272,7 +272,7 @@ namespace ThreeDModelProcessing.Algorithm
         public virtual float PathCostEstimate(Vector3 startPoint, Vector3 destination)
         {
             float estimateCost = (int)Vector3.Distance(startPoint, destination);
-            Debug.Log("estimate cost : " + estimateCost);
+            // Debug.Log("estimate cost : " + estimateCost);
             return estimateCost;
         }
     }

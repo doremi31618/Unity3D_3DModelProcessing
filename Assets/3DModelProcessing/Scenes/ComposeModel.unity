@@ -475,6 +475,36 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 9918935d7ae898541b9bad1c7f04107a, type: 3}
   m_PrefabInstance: {fileID: 951284293}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &811134260
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 811134261}
+  m_Layer: 0
+  m_Name: CompareEdge
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &811134261
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 811134260}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.12606673, y: -0.8267858, z: 2.0696042}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 5
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &834160368
 GameObject:
   m_ObjectHideFlags: 0
@@ -1806,7 +1836,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8164078558894130103}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: -0.029, y: 0, z: 0.012}
   m_LocalScale: {x: 0.0010000003, y: 0.001, z: 0.0010000002}
   m_Children: []
   m_Father: {fileID: 543450653286441428}
@@ -1951,6 +1981,8 @@ MonoBehaviour:
   extension: .txt
   fileName: edgeData_02
   graphName: edgeGraph_02
+  gizmosColor: {r: 1, g: 0, b: 0, a: 1}
+  scale: 0.01
   isDrawPreview: 1
   isUseGUI: 1
   isDrawGizmos: 0
@@ -1977,8 +2009,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   isSelected: 1
   selectedEdgeVertices: []
-  gizmosColor: {r: 1, g: 0, b: 0, a: 1}
-  scale: 0.01
+  SpherePreview: []
 --- !u!1 &8164078558894130103
 GameObject:
   m_ObjectHideFlags: 0
@@ -2020,6 +2051,8 @@ MonoBehaviour:
   extension: .txt
   fileName: edgeData_04
   graphName: edgeGraph_04
+  gizmosColor: {r: 1, g: 1, b: 1, a: 1}
+  scale: 0.01
   isDrawPreview: 0
   isUseGUI: 0
   isDrawGizmos: 0
@@ -2046,5 +2079,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   isSelected: 0
   selectedEdgeVertices: []
-  gizmosColor: {r: 1, g: 0, b: 0, a: 1}
-  scale: 0.01
+  SpherePreview: []

@@ -446,7 +446,7 @@ namespace ThreeDModelProcessing.Edge
         void OnGUI()
         {
             if (!isUseGUI) return;
-            Rect btn = new Rect(50, 50, 150, 50);
+            Rect btn = new Rect(50, 50, 100, 30);
             if (GUI.Button(btn, "method 1"))
             {
                 // method_1();
@@ -454,14 +454,18 @@ namespace ThreeDModelProcessing.Edge
                 StartCoroutine(method_1_optimize_coroutine());
             }
 
-            Rect btn2 = new Rect(250, 50, 150, 50);
+            Rect btn2 = new Rect(50, 100, 100, 30);
             if (GUI.Button(btn2, "method 2 "))
             {
                 // method_1();
                 StartCoroutine(method_2_optimize_coroutine());
             }
 
-            GUI.Label(new Rect(50, 100, 150, 50), "Loading : " + percentage * 100 + "%");
+            angle = GUI.HorizontalSlider(new Rect(50, 150, 100, 30), angle, 10F, 90.0F);
+            GUI.Label(new Rect(160, 145, 150, 50), "angle : " + angle);
+
+            GUI.Label(new Rect(50, 200, 150, 50), "Loading : " + percentage * 100 + "%");
+
         }
     }
 

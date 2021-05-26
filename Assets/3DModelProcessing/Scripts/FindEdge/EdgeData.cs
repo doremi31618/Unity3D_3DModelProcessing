@@ -12,6 +12,8 @@ namespace ThreeDModelProcessing.Edge
         public string extension = ".txt";
         public string fileName = "edgeData";
         public string graphName = "edgeGraph";
+        public Color gizmosColor = Color.white;
+        [Range(0.001f, 0.01f)] public float scale = 0.005f;
         public bool isDrawPreview;
         public bool isUseGUI;
         public bool isDrawGizmos;

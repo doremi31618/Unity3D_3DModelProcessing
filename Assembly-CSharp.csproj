@@ -50,8 +50,8 @@
      <Compile Include="Assets\3DModelProcessing\Scripts\FindEdge\EdgeReader.cs" />
      <Compile Include="Assets\3DModelProcessing\Scripts\FindEdge\EdgeDataFormat.cs" />
      <Compile Include="Assets\3DModelProcessing\Scripts\Experiment\SurfaceSplitor.cs" />
-     <Compile Include="Assets\OxOD\Demo\TextSaver.cs" />
-     <Compile Include="Assets\OxOD\Scripts\DoubleclickUI.cs" />
+     <Compile Include="Assets\ThirdParty\OxOD\Demo\TextSaver.cs" />
+     <Compile Include="Assets\ThirdParty\OxOD\Scripts\DoubleclickUI.cs" />
      <Compile Include="Assets\3DModelProcessing\Scripts\Utility\AlgorithmUtility.cs" />
      <Compile Include="Assets\3DModelProcessing\Scripts\Center\CenterModel.cs" />
      <Compile Include="Assets\3DModelProcessing\Scripts\FindEdge\EdgeSelector.cs" />
@@ -59,56 +59,56 @@
      <Compile Include="Assets\3DModelProcessing\Scripts\Experiment\FindClosestPointOfVertex.cs" />
      <Compile Include="Assets\3DModelProcessing\Scripts\Utility\MeshUtility.cs" />
      <Compile Include="Assets\3DModelProcessing\Scripts\FindEdge\EdgeData.cs" />
-     <Compile Include="Assets\OxOD\Demo\FolderPathDisplayer.cs" />
+     <Compile Include="Assets\ThirdParty\OxOD\Demo\FolderPathDisplayer.cs" />
      <Compile Include="Assets\3DModelProcessing\Scripts\testTriangle.cs" />
      <Compile Include="Assets\3DModelProcessing\Scripts\MeshSimplify\ThirdParty\ObjMesh.cs" />
      <Compile Include="Assets\3DModelProcessing\Scripts\Experiment\VertexNormalVisualizer.cs" />
      <Compile Include="Assets\3DModelProcessing\Scripts\MeshSimplify\MeshSimplify_ui.cs" />
-     <Compile Include="Assets\OxOD\Scripts\FileListElement.cs" />
+     <Compile Include="Assets\ThirdParty\OxOD\Scripts\FileListElement.cs" />
      <Compile Include="Assets\3DModelProcessing\Scripts\ModelEditor\VertexGizmos.cs" />
      <Compile Include="Assets\3DModelProcessing\Scripts\Experiment\ProceduralMeshGenerator.cs" />
-     <Compile Include="Assets\OxOD\Demo\FileSelector.cs" />
+     <Compile Include="Assets\ThirdParty\OxOD\Demo\FileSelector.cs" />
      <Compile Include="Assets\3DModelProcessing\Scripts\FindEdge\EdgeDataGizmos.cs" />
      <Compile Include="Assets\3DModelProcessing\Scripts\FindEdge\EdgeFinder.cs" />
      <Compile Include="Assets\3DModelProcessing\Scripts\ModelEditor\EditMesh.cs" />
-     <Compile Include="Assets\OxOD\Demo\ImageLoaderOxOD.cs" />
+     <Compile Include="Assets\ThirdParty\OxOD\Demo\ImageLoaderOxOD.cs" />
      <Compile Include="Assets\3DModelProcessing\Scripts\Experiment\SurfaceDataManager.cs" />
      <Compile Include="Assets\3DModelProcessing\ObjExporter\ObjExporter.cs" />
      <Compile Include="Assets\3DModelProcessing\Scripts\MeshSimplify\ProcessMeshSimplify.cs" />
      <Compile Include="Assets\3DModelProcessing\Scripts\Experiment\SnapFace.cs" />
-     <Compile Include="Assets\OxOD\Scripts\FileDialog.cs" />
+     <Compile Include="Assets\ThirdParty\OxOD\Scripts\FileDialog.cs" />
      <None Include="Assets\3DModelProcessing\Shader\NormalDebug.shader" />
-     <None Include="Assets\OxOD\Font\LICENCE.txt" />
+     <None Include="Assets\ThirdParty\OxOD\Font\LICENCE.txt" />
      <None Include="Assets\3DModelProcessing\Shader\VertexColor.shader" />
+ <Reference Include="Unity.VSCode.Editor">
+ <HintPath>C:/Users/panos/Desktop/史語所/Unity Project/Unity3D_3DModelProcessing/Library/ScriptAssemblies/Unity.VSCode.Editor.dll</HintPath>
+ </Reference>
  <Reference Include="Whinarn.UnityMeshSimplifier.Editor">
- <HintPath>C:/Users/dorem/Desktop/史語館/Unity3D_3DModelProcessing/Library/ScriptAssemblies/Whinarn.UnityMeshSimplifier.Editor.dll</HintPath>
+ <HintPath>C:/Users/panos/Desktop/史語所/Unity Project/Unity3D_3DModelProcessing/Library/ScriptAssemblies/Whinarn.UnityMeshSimplifier.Editor.dll</HintPath>
  </Reference>
  <Reference Include="Unity.TextMeshPro.Editor">
- <HintPath>C:/Users/dorem/Desktop/史語館/Unity3D_3DModelProcessing/Library/ScriptAssemblies/Unity.TextMeshPro.Editor.dll</HintPath>
+ <HintPath>C:/Users/panos/Desktop/史語所/Unity Project/Unity3D_3DModelProcessing/Library/ScriptAssemblies/Unity.TextMeshPro.Editor.dll</HintPath>
  </Reference>
  <Reference Include="Unity.Timeline.Editor">
- <HintPath>C:/Users/dorem/Desktop/史語館/Unity3D_3DModelProcessing/Library/ScriptAssemblies/Unity.Timeline.Editor.dll</HintPath>
+ <HintPath>C:/Users/panos/Desktop/史語所/Unity Project/Unity3D_3DModelProcessing/Library/ScriptAssemblies/Unity.Timeline.Editor.dll</HintPath>
  </Reference>
  <Reference Include="Unity.Timeline">
- <HintPath>C:/Users/dorem/Desktop/史語館/Unity3D_3DModelProcessing/Library/ScriptAssemblies/Unity.Timeline.dll</HintPath>
+ <HintPath>C:/Users/panos/Desktop/史語所/Unity Project/Unity3D_3DModelProcessing/Library/ScriptAssemblies/Unity.Timeline.dll</HintPath>
  </Reference>
  <Reference Include="Unity.TextMeshPro">
- <HintPath>C:/Users/dorem/Desktop/史語館/Unity3D_3DModelProcessing/Library/ScriptAssemblies/Unity.TextMeshPro.dll</HintPath>
+ <HintPath>C:/Users/panos/Desktop/史語所/Unity Project/Unity3D_3DModelProcessing/Library/ScriptAssemblies/Unity.TextMeshPro.dll</HintPath>
  </Reference>
  <Reference Include="UnityEditor.UI">
- <HintPath>C:/Users/dorem/Desktop/史語館/Unity3D_3DModelProcessing/Library/ScriptAssemblies/UnityEditor.UI.dll</HintPath>
+ <HintPath>C:/Users/panos/Desktop/史語所/Unity Project/Unity3D_3DModelProcessing/Library/ScriptAssemblies/UnityEditor.UI.dll</HintPath>
  </Reference>
  <Reference Include="Unity.Rider.Editor">
- <HintPath>C:/Users/dorem/Desktop/史語館/Unity3D_3DModelProcessing/Library/ScriptAssemblies/Unity.Rider.Editor.dll</HintPath>
+ <HintPath>C:/Users/panos/Desktop/史語所/Unity Project/Unity3D_3DModelProcessing/Library/ScriptAssemblies/Unity.Rider.Editor.dll</HintPath>
  </Reference>
  <Reference Include="UnityEngine.UI">
- <HintPath>C:/Users/dorem/Desktop/史語館/Unity3D_3DModelProcessing/Library/ScriptAssemblies/UnityEngine.UI.dll</HintPath>
+ <HintPath>C:/Users/panos/Desktop/史語所/Unity Project/Unity3D_3DModelProcessing/Library/ScriptAssemblies/UnityEngine.UI.dll</HintPath>
  </Reference>
  <Reference Include="Whinarn.UnityMeshSimplifier.Runtime">
- <HintPath>C:/Users/dorem/Desktop/史語館/Unity3D_3DModelProcessing/Library/ScriptAssemblies/Whinarn.UnityMeshSimplifier.Runtime.dll</HintPath>
- </Reference>
- <Reference Include="Unity.VSCode.Editor">
- <HintPath>C:/Users/dorem/Desktop/史語館/Unity3D_3DModelProcessing/Library/ScriptAssemblies/Unity.VSCode.Editor.dll</HintPath>
+ <HintPath>C:/Users/panos/Desktop/史語所/Unity Project/Unity3D_3DModelProcessing/Library/ScriptAssemblies/Whinarn.UnityMeshSimplifier.Runtime.dll</HintPath>
  </Reference>
  <Reference Include="UnityEngine">
  <HintPath>C:/Program Files/Unity/Hub/Editor/2020.3.6f1/Editor/Data/Managed/UnityEngine/UnityEngine.dll</HintPath>
@@ -333,7 +333,7 @@
  <HintPath>C:/Program Files/Unity/Hub/Editor/2020.3.6f1/Editor/Data/Managed/UnityEngine/UnityEditor.UnityConnectModule.dll</HintPath>
  </Reference>
  <Reference Include="MeshDecimator">
- <HintPath>C:/Users/dorem/Desktop/史語館/Unity3D_3DModelProcessing/Assets/3DModelProcessing/Scripts/MeshSimplify/ThirdParty/MeshDecimator.dll</HintPath>
+ <HintPath>C:/Users/panos/Desktop/史語所/Unity Project/Unity3D_3DModelProcessing/Assets/3DModelProcessing/Scripts/MeshSimplify/ThirdParty/MeshDecimator.dll</HintPath>
  </Reference>
  <Reference Include="mscorlib">
  <HintPath>C:/Program Files/Unity/Hub/Editor/2020.3.6f1/Editor/Data/MonoBleedingEdge/lib/mono/4.7.1-api/mscorlib.dll</HintPath>

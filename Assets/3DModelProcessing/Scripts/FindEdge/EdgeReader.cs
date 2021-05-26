@@ -83,7 +83,7 @@ namespace ThreeDModelProcessing.Edge
         void OnGUI()
         {
             if (!isUseGUI) return;
-            Rect btn = new Rect(50, 150, 150, 50);
+            Rect btn = new Rect(50, 250, 100, 30);
             if (GUI.Button(btn, "Read Edge"))
             {
                 ReadEdge(readFrom);
