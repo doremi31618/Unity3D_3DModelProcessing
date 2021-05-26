@@ -21,7 +21,7 @@ public class ProcessMeshSimplify : MonoBehaviour
     public string info;
     public async void SimplifyObj(string sourcePath, string destPath, float quality)
     {
-        simplifyTask = new Task(() =>
+        await Task.Run(() =>
         {
             quality = MathHelper.Clamp01(quality);
             ObjMesh sourceObjMesh = new ObjMesh();
@@ -103,12 +103,12 @@ public class ProcessMeshSimplify : MonoBehaviour
             // Console.WriteLine(info_2);
             simplifyInfo.Invoke(info_2);
             simplifyInfo.Invoke("finish");
-            DisposeTask();
+            // DisposeTask();
         });
-        simplifyTask.Start();
+        // simplifyTask.Start();
     }
     public void DisposeTask(){
-        simplifyTask.Dispose();
+        // simplifyTask.Dispose();
     }
 
     void SimplifyMesh()
