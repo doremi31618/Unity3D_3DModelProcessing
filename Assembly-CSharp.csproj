@@ -47,18 +47,18 @@
   <ItemGroup>
      <Compile Include="Assets\3DModelProcessing\Scripts\Experiment\MoveCamera.cs" />
      <Compile Include="Assets\3DModelProcessing\Scripts\ModelEditor\FaceGizmos.cs" />
-     <Compile Include="Assets\3DModelProcessing\Scripts\FindEdge\EdgeReader.cs" />
-     <Compile Include="Assets\3DModelProcessing\Scripts\FindEdge\EdgeDataFormat.cs" />
+     <Compile Include="Assets\3DModelProcessing\Scripts\Edge\EdgeReader.cs" />
+     <Compile Include="Assets\3DModelProcessing\Scripts\Edge\EdgeDataFormat.cs" />
      <Compile Include="Assets\3DModelProcessing\Scripts\Experiment\SurfaceSplitor.cs" />
      <Compile Include="Assets\ThirdParty\OxOD\Demo\TextSaver.cs" />
      <Compile Include="Assets\ThirdParty\OxOD\Scripts\DoubleclickUI.cs" />
      <Compile Include="Assets\3DModelProcessing\Scripts\Utility\AlgorithmUtility.cs" />
      <Compile Include="Assets\3DModelProcessing\Scripts\Center\CenterModel.cs" />
-     <Compile Include="Assets\3DModelProcessing\Scripts\FindEdge\EdgeSelector.cs" />
+     <Compile Include="Assets\3DModelProcessing\Scripts\Edge\EdgeSelector.cs" />
      <Compile Include="Assets\3DModelProcessing\Scripts\Experiment\SetRenderMode.cs" />
      <Compile Include="Assets\3DModelProcessing\Scripts\Experiment\FindClosestPointOfVertex.cs" />
      <Compile Include="Assets\3DModelProcessing\Scripts\Utility\MeshUtility.cs" />
-     <Compile Include="Assets\3DModelProcessing\Scripts\FindEdge\EdgeData.cs" />
+     <Compile Include="Assets\3DModelProcessing\Scripts\Edge\EdgeData.cs" />
      <Compile Include="Assets\ThirdParty\OxOD\Demo\FolderPathDisplayer.cs" />
      <Compile Include="Assets\3DModelProcessing\Scripts\testTriangle.cs" />
      <Compile Include="Assets\3DModelProcessing\Scripts\MeshSimplify\ThirdParty\ObjMesh.cs" />
@@ -68,8 +68,8 @@
      <Compile Include="Assets\3DModelProcessing\Scripts\ModelEditor\VertexGizmos.cs" />
      <Compile Include="Assets\3DModelProcessing\Scripts\Experiment\ProceduralMeshGenerator.cs" />
      <Compile Include="Assets\ThirdParty\OxOD\Demo\FileSelector.cs" />
-     <Compile Include="Assets\3DModelProcessing\Scripts\FindEdge\EdgeDataGizmos.cs" />
-     <Compile Include="Assets\3DModelProcessing\Scripts\FindEdge\EdgeFinder.cs" />
+     <Compile Include="Assets\3DModelProcessing\Scripts\Edge\EdgeDataGizmos.cs" />
+     <Compile Include="Assets\3DModelProcessing\Scripts\Edge\EdgeFinder.cs" />
      <Compile Include="Assets\3DModelProcessing\Scripts\ModelEditor\EditMesh.cs" />
      <Compile Include="Assets\ThirdParty\OxOD\Demo\ImageLoaderOxOD.cs" />
      <Compile Include="Assets\3DModelProcessing\Scripts\Experiment\SurfaceDataManager.cs" />
@@ -77,6 +77,7 @@
      <Compile Include="Assets\3DModelProcessing\Scripts\MeshSimplify\ProcessMeshSimplify.cs" />
      <Compile Include="Assets\3DModelProcessing\Scripts\Experiment\SnapFace.cs" />
      <Compile Include="Assets\ThirdParty\OxOD\Scripts\FileDialog.cs" />
+     <Compile Include="Assets\3DModelProcessing\Scripts\Edge\EdgeComparators.cs" />
      <None Include="Assets\3DModelProcessing\Shader\NormalDebug.shader" />
      <None Include="Assets\ThirdParty\OxOD\Font\LICENCE.txt" />
      <None Include="Assets\3DModelProcessing\Shader\VertexColor.shader" />

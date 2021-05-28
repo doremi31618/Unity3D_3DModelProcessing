@@ -202,10 +202,9 @@ namespace ThreeDModelProcessing.Algorithm
             firstNode.currentCost = 0;
             firstNode.estimateCost = PathCostEstimate(startPoint, destination);
             allNode.Add(startPoint, firstNode);
-
+            
             PriorityQueue<Vector3> openList = new PriorityQueue<Vector3>(startPoint, firstNode.estimateCost);
             List<Vector3> closedList = new List<Vector3>();
-
 
             int stepCounter = 0;
             while (openList.Count != 0 || stepCounter > MAX_STEPS)
@@ -227,6 +226,8 @@ namespace ThreeDModelProcessing.Algorithm
                         if (nextNode == null)
                             break;
                     }
+                    finalPath.Add(nextNode.position);
+                        
                 }
                 else
                 {
