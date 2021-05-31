@@ -35,6 +35,9 @@ namespace ThreeDModelProcessing.Edge
             }
 
         }
+
+        public float getSelectedEdgeDistance{
+            get{ if (selectedEdge.Count > 0) return Vector3.Distance(selectedEdge[0], selectedEdge[selectedEdge.Count-1]); else return 0;}}
         public void UpdateShortestPath(Vector3 head, Vector3 tail)
         {
             AStartSearch astarSearch = new AStartSearch(head, tail, edgeCollection.edgeGraph);

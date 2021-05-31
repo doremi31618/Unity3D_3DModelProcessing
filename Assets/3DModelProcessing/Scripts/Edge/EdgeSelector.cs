@@ -33,7 +33,7 @@ namespace ThreeDModelProcessing.Edge
                 selectedEdgeVertices = new Vector3[2];
                 edgeData.ClearShortestPath();
             }
-            print("Click count " + clickCount);
+            // print("Click count " + clickCount);
             if (clickCount < 2)
             {
                 selectedEdgeVertices[clickCount] = closestPoint;
@@ -88,7 +88,7 @@ namespace ThreeDModelProcessing.Edge
 
         void OnDrawGizmos()
         {
-            if (Time.time == 0 && selectedEdgeVertices.Length == 2) return;
+            if (Time.time <= 0 && selectedEdgeVertices.Length == 2 || selectedEdgeVertices == null) return;
             Gizmos.color = gizmosColor;
             foreach (var point in selectedEdgeVertices)
             {
