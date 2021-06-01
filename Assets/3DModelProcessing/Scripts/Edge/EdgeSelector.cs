@@ -80,7 +80,8 @@ namespace ThreeDModelProcessing.Edge
 
         void OnMouseDown()
         {
-            if (isSelected)
+            
+            if (isSelected) 
             {
                 SelectVertex();
             }
@@ -88,6 +89,7 @@ namespace ThreeDModelProcessing.Edge
 
         void OnDrawGizmos()
         {
+            if (GetComponent<MeshCollider>() == null) gameObject.AddComponent<MeshCollider>();
             if (Time.time <= 0 && selectedEdgeVertices.Length == 2 || selectedEdgeVertices == null) return;
             Gizmos.color = gizmosColor;
             foreach (var point in selectedEdgeVertices)

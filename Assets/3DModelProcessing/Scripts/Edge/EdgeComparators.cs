@@ -13,47 +13,11 @@ namespace ThreeDModelProcessing.Edge
     {
         public EdgeData model_1;
         public EdgeData model_2;
-        public float threshold;
+        public float ocj_threshold;
 
 
-        void CompareEdgeSimilarity()
-        {
-            if (model_1.selectedEdge.Count != 0 && model_2.selectedEdge.Count != 0)
-            {
+        
 
-                //compute ratio between selected Edge 1 and selected Edge 2
-                float edgeDist1 = model_1.getSelectedEdgeDistance;
-                float edgeDist2 = model_2.getSelectedEdgeDistance;
-
-                print("edgeDist2" + edgeDist2);
-                //transform edge vector list to normal space 
-                if (edgeDist1 > edgeDist2)
-                {
-                    model_1.selectedEdge = TransformEdgeToNormalSpace(model_1.selectedEdge);
-                    model_2.selectedEdge = TransformEdgeToNormalSpace(model_2.selectedEdge, edgeDist2 / edgeDist1);
-                    print("scale " + edgeDist2 / edgeDist1);
-                }
-                else
-                {
-                    model_1.selectedEdge = TransformEdgeToNormalSpace(model_1.selectedEdge, edgeDist1 / edgeDist2);
-                    model_2.selectedEdge = TransformEdgeToNormalSpace(model_2.selectedEdge);
-                    print("scale " + edgeDist1 / edgeDist2);
-                }
-
-                // bool similarity = OCJSearch(model_1.selectedEdge, model_2.selectedEdge);
-                float similarity = DiscreteFreshetDistance(model_1.selectedEdge, model_2.selectedEdge);
-                print(similarity);
-                return;
-            }
-
-            if (model_1.selectedEdge.Count != 0)
-                model_1.selectedEdge = TransformEdgeToNormalSpace(model_1.selectedEdge);
-
-            if (model_2.selectedEdge.Count != 0)
-                model_2.selectedEdge = TransformEdgeToNormalSpace(model_2.selectedEdge);
-
-
-        }
         Vector3 FindFarestPointFromLine(Vector3 line_point_1, Vector3 line_point_2, List<Vector3> points)
         {
             Vector3 farPoint = Vector3.zero;
@@ -183,18 +147,18 @@ namespace ThreeDModelProcessing.Edge
                 minDistance[i] = shortDist;
             }
 
-            // float frechetDist = 0;
-            // for (int i = 0; i < minDistance.Length; i++)
-            // {
-            //     if (minDistance[i] > frechetDist)
-            //         frechetDist = minDistance[i];
-            // }
             float frechetDist = 0;
             for (int i = 0; i < minDistance.Length; i++)
             {
                 if (minDistance[i] > frechetDist)
-                    frechetDist += minDistance[i] * minDistance[i]  / minDistance.Length;
+                    frechetDist = minDistance[i];
             }
+            // float frechetDist = 0;
+            // for (int i = 0; i < minDistance.Length; i++)
+            // {
+            //     if (minDistance[i] > frechetDist)
+            //         frechetDist += minDistance[i] * minDistance[i]  / minDistance.Length;
+            // }
             float possibility = frechetDist;//1 - 
             return possibility;
         }
@@ -252,14 +216,81 @@ namespace ThreeDModelProcessing.Edge
             return true;
         }
 
+        float DTWmethod(List<Vector3> edge1, List<Vector3> edge2){
+
+            int n = edge1.Count - 1;
+            int m = edge2.Count - 1;
+
+            float[,] distMatrix = new float[edge1.Count, edge2.Count];
+            for(int i=1; i<=n; i++)
+                distMatrix[i,0] = Mathf.Infinity;
+            for(int j=1; j<=m; j++)
+                distMatrix[0,j] = Mathf.Infinity;
+            distMatrix[0,0] = 0;
+
+            for(int i=1; i<=n; i++){
+                for(int j=1; j<=m; j++){
+                    float cost = Vector3.Distance(edge1[i], edge2[j]);
+                    distMatrix[i,j] =cost + Mathf.Min(
+                        distMatrix[i-1, j-1],
+                        distMatrix[i-1, j],
+                        distMatrix[i  , j-1]);
+                }
+            }
+
+            return distMatrix[n, m];
+
+        }
+
         bool LessThanThreshold(Vector3 target, Vector3 candidate)
         {
             // print("target :" + target + " candidate :" + candidate);
-            return (Vector3.Distance(target, candidate) < threshold);
+            return (Vector3.Distance(target, candidate) < ocj_threshold);
         }
-        // public void StartTransform(){
 
-        // }
+        void CompareEdgeSimilarity()
+        {
+            if (model_1.selectedEdge.Count != 0 && model_2.selectedEdge.Count != 0)
+            {
+
+                //compute ratio between selected Edge 1 and selected Edge 2
+                float edgeDist1 = model_1.getSelectedEdgeDistance;
+                float edgeDist2 = model_2.getSelectedEdgeDistance;
+
+                print("edgeDist2" + edgeDist2);
+                //transform edge vector list to normal space 
+                if (edgeDist1 > edgeDist2)
+                {
+                    model_1.selectedEdge = TransformEdgeToNormalSpace(model_1.selectedEdge);
+                    model_2.selectedEdge = TransformEdgeToNormalSpace(model_2.selectedEdge);
+                    // model_2.selectedEdge = TransformEdgeToNormalSpace(model_2.selectedEdge, edgeDist2 / edgeDist1);
+                    
+                    print("scale " + edgeDist2 / edgeDist1);
+                }
+                else
+                {
+                    model_1.selectedEdge = TransformEdgeToNormalSpace(model_1.selectedEdge);
+                    model_2.selectedEdge = TransformEdgeToNormalSpace(model_2.selectedEdge);
+                    // model_1.selectedEdge = TransformEdgeToNormalSpace(model_1.selectedEdge, edgeDist1 / edgeDist2);
+                    
+                    print("scale " + edgeDist1 / edgeDist2);
+                }
+
+                // bool similarity = OCJSearch(model_1.selectedEdge, model_2.selectedEdge);
+                float similarity = DiscreteFreshetDistance(model_1.selectedEdge, model_2.selectedEdge);
+                // float similarity = DTWmethod(model_1.selectedEdge, model_2.selectedEdge);
+                print(similarity);
+                return;
+            }
+
+            if (model_1.selectedEdge.Count != 0)
+                model_1.selectedEdge = TransformEdgeToNormalSpace(model_1.selectedEdge);
+
+            if (model_2.selectedEdge.Count != 0)
+                model_2.selectedEdge = TransformEdgeToNormalSpace(model_2.selectedEdge);
+
+
+        }
         private void OnDrawGizmos()
         {
             if (model_1.selectedEdge.Count != 0)
@@ -282,6 +313,7 @@ namespace ThreeDModelProcessing.Edge
 
 
         }
+
         private void OnGUI()
         {
             Rect butRect = new Rect(500, 50, 150, 50);
